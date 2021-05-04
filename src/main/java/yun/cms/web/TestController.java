@@ -45,4 +45,13 @@ public class TestController {
         
     }
     
+    @RequestMapping("/upbitTest3")
+    public void upbitTest3() {
+        Test t=new Test();
+        t.setName("testT");
+        t.setPw("PWT");
+//        System.out.println(t);
+        
+    }
+    
 }

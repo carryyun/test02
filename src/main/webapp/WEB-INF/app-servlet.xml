@@ -16,6 +16,8 @@
     <context:component-scan
         base-package="yun.cms" />
     <task:annotation-driven />
+    
+    <mvc:resources location="/resources/" mapping="/resources/**"></mvc:resources>
      
     <!-- 기존의 ViewResolver를 교체하기 이 ViewResolver는 request handler가 리턴한 경로의 앞, 
         뒤에 공통 경로를 추가하여 JSP 파일을 찾아 실행한다. -->
