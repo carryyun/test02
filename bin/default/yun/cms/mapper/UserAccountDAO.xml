@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="yun.cms.dao.UserAccountDAO">
+	
+	<resultMap type="UserAccount" id="UserAccountMap">
+		<id column="usersid" property="usersid" />
+		<result column="id" property="id" />
+		<result column="pw" property="pw" />
+	</resultMap>
+	
+	<select id="findAll" resultMap="UserAccountMap">
+		select
+			*
+		from
+			userAccount
+		oder by
+			usersid asc
+	</select>
+	
+	<select id="findByNo" resultMap="UserAccountMap">
+		select
+			*
+		from
+			userAccount
+		where
+			usersid=#{no}
+	</select>
+	
+	<insert id="insert">
+		insert into userAccount(id,pw) values(#{id},#{pw})
+	</insert>
+	<update id="update">
+		update userAccount
+			set 
+				<if test="id != null"> id=#{id},</if>
+				<if test="pw != null"> pw=#{pw}</if>
+			where
+				usersid=#{usersid}
+	</update>
+	
+	<delete id="delete">
+		delete from userAccount
+		where
+			usersid=#{usersid}
+	</delete>
+	
+</mapper>

@@ -17,12 +17,13 @@
 <div id="wrapbody" class="wrap body">
 
 	<div class="container">
-	<input type="text" id="testInput"> <button onclick="Test(this)">Go!</button>
+	<input type="text" id="testInput1"> <input type="text" id="testInput2">
+	<button onclick="Test(this)">Go!</button> <button onclick="ADDITEM(this)">ADDITEM!</button>
 		<div class="row" id="coinList">
 			<div id="coin1" class="col-md-3 coinItem" onclick="coinClick(this)">
 					<div class="row" id="itemToggle">
 						<div class="col-md-3">
-							<span>XRP</span>
+							<span class="marketName"></span>
 						</div>
 						<div id="coinItemRight" class="col-md-9 d-flex-wrap">
 							<div id="barWrap-item" class="col-md-12 d-inline-block">
@@ -60,7 +61,7 @@
 										
 										<!-- infoDiv의 오른쪽 [코인이름] -->
 										<div class="col-md-12 nop">
-											<span>리플</span>
+											<span id="tableCoinName"></span>
 										</div>
 										
 										<!-- infoDiv의 오른쪽 [그래프] -->
@@ -90,7 +91,7 @@
 			<div id="coin2" class="col-md-3 coinItem" onclick="coinClick(this)">
 				<div class="row" id="itemToggle">
 					<div class="col-md-3">
-						<span>XRP</span>
+						<span class="marketName"></span>
 					</div>
 					<div id="coinItemRight" class="col-md-9 d-flex-wrap">
 						<div id="barWrap-item" class="col-md-12 d-inline-block">
@@ -108,9 +109,9 @@
 				<div class="abc"></div>
 			</div>
 			<div id="coin3" class="col-md-3 coinItem" onclick="coinClick(this)">
-			<div class="row" id="itemToggle">
+				<div class="row" id="itemToggle">
 					<div class="col-md-3">
-						<span>XRP</span>
+						<span class="marketName"></span>
 					</div>
 					<div id="coinItemRight" class="col-md-9 d-flex-wrap">
 						<div id="barWrap-item" class="col-md-12 d-inline-block">
@@ -128,12 +129,53 @@
 				<div class="abc"></div>
 			</div>
 			<div id="coin4" class="col-md-3 coinItem" onclick="coinClick(this)">
+				<div class="row" id="itemToggle">
+					<div class="col-md-3">
+						<span class="marketName"></span>
+					</div>
+					<div id="coinItemRight" class="col-md-9 d-flex-wrap">
+						<div id="barWrap-item" class="col-md-12 d-inline-block">
+							<div id="barBid-item">
+							</div>
+						</div>
+						
+						<div class="col-md-12 d-flex nop">
+							<span id="bidVolumeSpan-item" class="col-md-6 text-left nop"></span>
+							<span id="askVolumeSpan-item" class="col-md-6 text-right nop"></span>
+						</div>
+						
+					</div>
+				</div>
+				<div class="abc"></div>
 			</div>
 		</div>
 		<div class="row">
 			
 		</div>
 	</div>	
+	
+	<div id="hiddenitemCode" style="display: none;">
+		<div id="coinN" class="col-md-3 coinItem" onclick="coinClick(this)">
+				<div class="row" id="itemToggle">
+					<div class="col-md-3">
+						<span class="marketName"></span>
+					</div>
+					<div id="coinItemRight" class="col-md-9 d-flex-wrap">
+						<div id="barWrap-item" class="col-md-12 d-inline-block">
+							<div id="barBid-item">
+							</div>
+						</div>
+						
+						<div class="col-md-12 d-flex nop">
+							<span id="bidVolumeSpan-item" class="col-md-6 text-left nop"></span>
+							<span id="askVolumeSpan-item" class="col-md-6 text-right nop"></span>
+						</div>
+						
+					</div>
+				</div>
+				<div class="abc"></div>
+			</div>
+	</div>
 	
 	<div class="pushFooter"></div>
 </div>
@@ -152,42 +194,72 @@ let XRPTotalVolume=0;
 let XRPBidVolume=0;
 let coinMap= new Map();
 
-function Test(item){
-	var input=$('#testInput').val();
-	var coin2 = $('#coin'+input+' div.class');
-	console.log(coin2);
-	/* coin2.css('display','none'); */
+
+//[21-05-04] 리스트 체결내역 ID를 저장하기위한 배열과 맵.
+//            - 임시로 어레이를 사용했는데 추후 볼륨을 저장한 방식과 동일하게 맵으로 변경해야함.
+let arrAskIdList = new Array();
+let arrBidIdList = new Array();
+let arrIdMap= new Map();
+
+
+//[21-05-04] tableCoinName = 체결테이블의 코인이름을 저장해두기 위한 변수. 수정이 필요할 것 같음 
+//			 tableinterval = 재귀함수를 담아두었다가 종료를 시키기위한 변수
+let tableCoinName="ETC";
+let tableInterval=200;
+let tableTimer="";
+
+
+//[21-05-04] 추후 사용자가 즐겨찾기 지정해둔 코인들을 받아와서 처리해야함. 이 내용은 DB연결후 삭제
+//let initListName = new Array('xrp','doge','etc','qtum');
+//[21-05-04] 컨트롤러에서 받아오는 리스트로 초기화시킴. 갯수에따라 조절하도록 html쪽도 수정해야함
+let initListName = ${str};
+
+$(function() {
+    const wrap =  document.getElementsByClassName('wrap');
+    document.body.style.background='#151e2e';
+    
+    //체결테이블 초기화 함수
+    initTable();
+    
+	//[21-05-04] setListItem() 삭제 후 새로 만들어진 기능으로 대체
+    //setListItem();
+    //처음 설정때문에 쓴 코드. 완성되면 삭제해야함 [21-05-04 완성 다음버전에서 주석까지 삭제할것.]
+    // setItem('xrp');
+    //================
+    let index=1;
+    initListName.forEach(i => {
+    	setItem(i);
+    	addListItem(i, index);
+    	index++;
+    });
+});
+
+
+
+function ADDITEM(item){
+	var coinList = $('#coinList');
 	
+	var tempItem= $('#hiddenitemCode div#coinN');
+	var num = Number(coinList.children().length)+1;
 	
-	/* var bar=document.getElementById('barBid-item');
- 	bar.style.width=((XRPBidVolume/XRPTotalVolume)*100)+'%';
- 	var bidspanI=document.getElementById('bidVolumeSpan-item');
- 	bidspan.innerText = (XRPBidVolume/1000).toFixed(2)+"K";
- 	
- 	var bar2=document.getElementById('barAsk-item');
- 	var askspan=document.getElementById('askVolumeSpan-item');
- 	askspan.innerText = ((XRPTotalVolume-XRPBidVolume)/1000).toFixed(2)+"K";
+	var copyItem = tempItem.clone();
+	copyItem.attr('id','coin'+num);
+	copyItem.css('display','block');
 	
-	setList2(); */
+	coinList.append(copyItem);
 }
-function setList2(){
+
+function Test(item){
+	var Cname=$('#testInput1').val();
+	var Cnum=$('#testInput2').val();
 	
-	var barI=document.getElementById('barBid-item');
- 	barI.style.width=((XRPBidVolume/XRPTotalVolume)*100)+'%';
- 	var bidspanI=document.getElementById('bidVolumeSpan-item');
- 	bidspanI.innerText = (XRPBidVolume/1000).toFixed(2)+"K";
- 	
- 	var barI2=document.getElementById('barAsk-item');
- 	var askspanI=document.getElementById('askVolumeSpan-item');
- 	askspanI.innerText = ((XRPTotalVolume-XRPBidVolume)/1000).toFixed(2)+"K";
- 	
-	setTimeout(setListItem, 500);
+	setItem(Cname.toUpperCase());
+	addListItem(Cname.toUpperCase(), Cnum);
 }
 
 
 //21-05-03 기존 체결표와 거래량을 아이템 안에 넣어두고, 아이템 클릭하면 크기가 변하도록 하기위해 onClick이벤트.
 function coinClick(item){
-	
 	//코인 상세정보(infoToggle)가 어디에 출력되는가에 상관없이 초기화부터 시켜줌.
 	document.getElementById('infoToggle').style.display="none";
 	
@@ -202,14 +274,7 @@ function coinClick(item){
 	
 	//아이템 누를때마다 토글처리
 	let nodes = document.getElementById(item.id).childNodes;
-	if(document.getElementById('infoToggle').style.display != 'none'){
-		// 21-05-04 클릭시 이전에 있던 속성을 변경시켜야함 => 여기 코드는 필요없음. 처음에 초기화시켜주는 방식으로 변경.
-		/* item.className="col-md-3 coinItem";
-		nodes[3].style.display="none";
-		document.getElementById('infoToggle').style.display="none";
-		item.style.height="50px";
-		nodes[1].style.display="flex"; */
-	}else{
+	if(document.getElementById('infoToggle').style.display == 'none'){
 		item.className="col-md-6 coinItem";
 		item.style.height="100%";
 		nodes[3].style.display="block";
@@ -217,9 +282,19 @@ function coinClick(item){
 		nodes[1].style.display="none";
 	}
 	
+	//[21-05-04] 재귀함수 호출을 중지시킨 후 선택된 코인의 이름으로 조회 시작
+	initTable();
+	clearTimeout(tableTimer);
+	//[21-05-04] 클릭한 코인의 코인명을 가져옴
+	tableCoinName=$('#'+item.id+" .marketName").html()
+	
+	tableTimer = setTimeout("setUpbitData(\'"+tableCoinName+"\')", tableInterval);
 }
 
-//21-05-03 제이쿼리로 변경.
+
+//[21-05-04] 테이블만 사용하는 값으로 변경하기위해 맵의 키값을 변경함(기존 키값의 뒤에 Table을 붙임)
+//			 -새로만들 setItem과 addListItem으로 대체해야함. ***이 함수는 삭제예정***
+//[21-05-03] 제이쿼리로 변경.
 // - 리스트에 아이템을 채우기위해 for문을 사용해야 하는데, 편하게 돌리기 위해.
 // - 또한, 제이쿼리를 사용하는것이 여러 coin아이템의 child들에게 접근하기가 쉬울것이라 생각됨.
 function setListItem(){
@@ -244,38 +319,127 @@ function setListItem(){
 	let askSpanX=$('#coin'+ 2 +' #askVolumeSpan-item');
 	askSpanX.html(((totalVolume-bidVolume)/1000).toFixed(2)+"K");
  
-	setTimeout(setListItem, 500);
-	
-	//21-05-03 이전 코드
-	/* var barI=document.getElementById('barBid-item');
- 	barI.style.width=((XRPBidVolume/XRPTotalVolume)*100)+'%';
- 	var bidspanI=document.getElementById('bidVolumeSpan-item');
- 	bidspanI.innerText = (XRPBidVolume/1000).toFixed(2)+"K";
- 	
- 	var barI2=document.getElementById('barAsk-item');
- 	var askspanI=document.getElementById('askVolumeSpan-item');
- 	askspanI.innerText = ((XRPTotalVolume-XRPBidVolume)/1000).toFixed(2)+"K"; */
+	setTimeout(setListItem, 1000);
 }
 
+
+//[21-05-04] 리스트 내 아이템의 그래프를 그려주기 위한 함수
+function setItem(coinName){
+	coinName=coinName.toUpperCase();
+	//[21-05-04] map을 활용해 변수명대신 키값으로 사용. 키값에는 변수를 사용할 수 있음.
+	let keyNameTotal=coinName+'TotalVolume';
+    let keyNameBid=coinName+'BidVolume';
+    
+    //[21-05-04] 코인이름을 매개변수로 보내는 함수(getTrade)를 통해 체결내역을 받아온다.
+	let arrResult = new Array();
+	arrResult=getTrade(coinName);
+	
+	arrResult.forEach(item => {
+		if(item.trade_volume>=50){
+       		//체결번호, 유일성체크 가능
+       		const checkId=item.sequential_id;
+       		//볼륨 소수점 버림처리
+       		const volume=Math.floor(item.trade_volume);
+       		//매수매도 구분
+       		const askbid=item.ask_bid;
+       		
+   			// - 21-05-03 비교방식변경 => 체결내역에 고유한 ID가 있었음 그걸 이용해 비교.
+       		if( (askbid=='ASK') && (arrAskIdList.indexOf(checkId) == -1) ){
+       			if(arrAskIdList.length>500){
+       				arrAskIdList.shift();
+       			}
+   	        	arrAskIdList.push(checkId);
+   	        	
+   	      		// 21-05-04 코인이름에따라 변수명이 달라짐. 하지만 변수선언할 때 이름에 변수를 사용 할 수 없음.
+   	        	//  - map을 활용해 변수명대신 키값으로 사용. 키값에는 변수를 사용할 수 있음.
+   	        	if(coinMap.get(keyNameTotal)==undefined){
+   	        		coinMap.set(keyNameTotal,'0');
+   	        	}
+   	        	coinMap.set(keyNameTotal,Number(coinMap.get(keyNameTotal))+volume);
+   	        	
+       		}else if( (askbid=='BID') && (arrBidIdList.indexOf(checkId) == -1) ){
+       			if(arrBidIdList.length>500){
+       				arrBidIdList.shift();
+       			}
+   	        	arrBidIdList.push(checkId);
+   	        	
+   	        	// 21-05-04 코인이름에따라 변수명이 달라짐. 하지만 변수선언할 때 이름에 변수를 사용 할 수 없음.
+   	        	//  - map을 활용해 변수명대신 키값으로 사용. 키값에는 변수를 사용할 수 있음.
+   	        	if(coinMap.get(keyNameTotal)==undefined){
+   	        		coinMap.set(keyNameTotal,'0');
+   	        	}
+   	        	if(coinMap.get(keyNameBid)==undefined){
+   	        		coinMap.set(keyNameBid,'0');
+   	        	}
+   	        	coinMap.set(keyNameTotal,Number(coinMap.get(keyNameTotal))+volume);
+   	        	coinMap.set(keyNameBid,Number(coinMap.get(keyNameBid))+volume);
+       		}
+       	}
+		if(coinMap.get(keyNameTotal)==undefined){
+       		coinMap.set(keyNameTotal,'0');
+       	}
+       	if(coinMap.get(keyNameBid)==undefined){
+       		coinMap.set(keyNameBid,'0');
+       	}
+	});
+	
+	setTimeout("setItem(\'"+ coinName +"\')", 1000);
+}
+//[21-05-04] 코인리스트 아이템의 값을 넣어주는 함수
+function addListItem(coinName, num){
+	coinName=coinName.toUpperCase();
+	let span=$('#coin'+ num +' .marketName');
+	span.html(coinName);
+	
+	let totalVolume=Number(coinMap.get(coinName+'TotalVolume'));
+	let bidVolume=Number(coinMap.get(coinName+'BidVolume'));
+	let bar=$('#coin'+ num +' #barBid-item');
+	bar.css('width',((bidVolume/totalVolume)*100)+'%')
+	
+	let bidSpan=$('#coin'+ num +' #bidVolumeSpan-item');
+	bidSpan.html((bidVolume/1000).toFixed(2)+"K");
+	let bar2=$('#coin'+ num +' #barAsk-item');
+	let askSpan=$('#coin'+ num +' #askVolumeSpan-item');
+	askSpan.html(((totalVolume-bidVolume)/1000).toFixed(2)+"K");
+	
+	//[21-05-04] setTimeout을 이용해 재귀함수를 사용할 때,
+	//			매개변수를 사용하게 된다면 **** 각 변수마다 따옴표를 **** 씌워줘야한다.
+	//			그렇지 않으면 매번 불러올때마다 변수값이 이상하게 추가되어
+	//			coinName,num,undefined 이런식으로 매개변수를 넘기게되므로 오류가 발행한다.
+	setTimeout('addListItem(\"'+coinName+ '\",\"' +num+'\")', 1000);
+}
+
+
+
+
+
+//21-05-04 체결테이블의 데이터를 계산하는 내용은 함수로 따로 빼야할 것 같음.
+//         -이 함수는 코인의 이름을 매개변수로 받아서 체결량만 계산하는 함수로 수정 할 예정.
 //21-05-03 ajax를 통해 값을 받아오는 함수를 새로 만들고, 이 함수에서는 ajax제거.[21-05-03해당작업 완료]
 function setUpbitData(coinName){
+	coinName= coinName.toUpperCase();
 	//ASK = 매수 / BID = 매도 ??? X 아래 설명 다시참고
 	//BID가 높은가격 == 위에 가격을 긁었다고 생각하면 이게 빨간색 매수로 표현이 되어야한다.
 	//ASK가 낮은가격 == 아래 가격에 던졌다고 생각하면 이게 파란색 매도로 표현이 되어야한다.
 	//BID == 호가창에 제시된 매수 할 수 있는 가격
 	//ASK == 호가창에 제시된 매도 할 수 있는 가격
-	
+	console.log(coinName+'Table의 데이터 요청함');
 	// 21-05-04 map을 활용해 변수명대신 키값으로 사용. 키값에는 변수를 사용할 수 있음.
-	let keyNameTotal=coinName+'TotalVolume';
-    let keyNameBid=coinName+'BidVolume';
+	let keyNameTotal=coinName+'TotalVolumeTable';
+    let keyNameBid=coinName+'BidVolumeTable';
 	
+    
+    //[21-05-04] 테이블의 코인 이름을 수정해줌.
+    $('#tableCoinName').html(coinName);
+    
 	//**********************************
 	// 21-05-03 함수 호출시 매개변수로 코인이름 받아오도록 수정해야함 
 	//**********************************
+	let arrResult = new Array();
 	arrResult=getTrade(coinName);
 	
 	arrResult.forEach(item => {
-		if(item.trade_volume>=50){
+		if(item.trade_volume>=100){
        		//체결번호, 유일성체크 가능
        		const checkId=item.sequential_id;
        		//체결시간
@@ -290,8 +454,6 @@ function setUpbitData(coinName){
        		// 이전 체결시간, 볼륨과 비교해 같은 주문인지 확인
    			// - 21-05-03 비교방식변경 => 체결내역에 고유한 ID가 있었음 그걸 이용해 비교.
        		if( (askbid=='ASK') && (arrAskId.indexOf(checkId) == -1) ){
-       			
-       			
        			if(arrAskId.length>100){
        				arrAskId.shift();
        			}
@@ -319,9 +481,11 @@ function setUpbitData(coinName){
    	        	
    	      		// 21-05-04 코인이름에따라 변수명이 달라짐. 하지만 변수선언할 때 이름에 변수를 사용 할 수 없음.
    	        	//  - map을 활용해 변수명대신 키값으로 사용. 키값에는 변수를 사용할 수 있음.
-   	        	if(coinMap.get(keyNameTotal)==undefined){
+   	        	if(coinMap.get(keyNameTotal)==undefined || Number(coinMap.get(keyNameTotal))<0 ){
    	        		coinMap.set(keyNameTotal,'0');
    	        	}
+   	      		
+   	      		// 체결테이블의 거래량은 따로 계산해야 함 ( 리스트의 아이템과 중복으로 계산 됨 )
    	        	coinMap.set(keyNameTotal,Number(coinMap.get(keyNameTotal))+volume);
    	        	
    	        	//N(7)줄이 넘어가면 첫번째 행 삭제
@@ -361,13 +525,13 @@ function setUpbitData(coinName){
    	        	
    	        	// 21-05-04 코인이름에따라 변수명이 달라짐. 하지만 변수선언할 때 이름에 변수를 사용 할 수 없음.
    	        	//  - map을 활용해 변수명대신 키값으로 사용. 키값에는 변수를 사용할 수 있음.
-   	        	
-   	        	if(coinMap.get(keyNameTotal)==undefined){
+   	        	if(coinMap.get(keyNameTotal)==undefined || Number(coinMap.get(keyNameTotal))<0){
    	        		coinMap.set(keyNameTotal,'0');
    	        	}
-   	        	if(coinMap.get(keyNameBid)==undefined){
+   	        	if(coinMap.get(keyNameBid)==undefined || Number(coinMap.get(keyNameBid))<0){
    	        		coinMap.set(keyNameBid,'0');
    	        	}
+   	      		// 체결테이블의 거래량은 따로 계산해야 함 ( 리스트의 아이템과 중복으로 계산 됨 )
    	        	coinMap.set(keyNameTotal,Number(coinMap.get(keyNameTotal))+volume);
    	        	coinMap.set(keyNameBid,Number(coinMap.get(keyNameBid))+volume);
    	        	
@@ -399,19 +563,17 @@ function setUpbitData(coinName){
 	});
 	
 	// 재귀 , 인터벌 300
-   	setTimeout("setUpbitData(\'"+coinName+"\')", 300);
-    	
-     
+   	tableTimer=setTimeout("setUpbitData(\'"+coinName+"\')", tableInterval);
 }
 
 //21-05-03
 //여러 코인의 정보를 ajax를 통해 가져와야하므로, 따로 함수를 만들고 async를 false로 설정해 동기식으로 변경.
 //- 동기식으로 처리하지 않으면 다른 함수에서 return 받아 사용할 때, undefined이 출력된다.
 // 이는 비동기식으로 처리할경우 ajax를 통해 값을 받아오기 전에 다음 코드를 진행하기 때문. 
-function getTrade(coin){
+function getTrade(coinName){
 	var tempArr = new Array();
 	$.ajax({
-  	url: "https://api.upbit.com/v1/trades/ticks?count=10&market=KRW-"+coin,
+  	url: "https://api.upbit.com/v1/trades/ticks?count=10&market=KRW-"+coinName,
   	async: false,
       dataType: "json"
   }).done(function(result){
@@ -420,11 +582,8 @@ function getTrade(coin){
 	return tempArr;
 }
 
-$(function() {
-    const wrap =  document.getElementsByClassName('wrap');
-    document.body.style.background='#151e2e';
-    
-    //체결테이블 초기화
+function initTable(){
+	//체결테이블 초기화
     // - 값을 -로 넣어둔 이유는 테이블의 모양이 바로 잡혀있도록 하기 위해.
     const initAskTable =  document.getElementById('askTable');
 	const initBidTable =  document.getElementById('bidTable');
@@ -446,11 +605,15 @@ $(function() {
        	initBidNewCell2.innerText = '-';
        	const initBidNewCell3 = initBidRow.insertCell(2);
        	initBidNewCell3.innerText = '-';
+       	
+       	if(initBidTable.tBodies[0].rows.length >7){
+       		initBidTable.deleteRow(0);
+       	}
+       	if(initAskTable.tBodies[0].rows.length >7){
+       		initAskTable.deleteRow(0);
+       	}
 	}
-    
-    setUpbitData("XRP");
-    setListItem();
-});
+} 
 
 function addComma(num){
 	return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");

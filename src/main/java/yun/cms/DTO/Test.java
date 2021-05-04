@@ -1,4 +1,4 @@
-package yun.cms.DTO;
+package yun.cms.dto;
 
 public class Test {
     String name;

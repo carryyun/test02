@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="yun.cms.dao.FavoriteCoinDAO">
+	
+	<resultMap type="FavoriteCoin" id="FavoriteCoinMap">
+		<id column="sid" property="usersid" />
+		<result column="coinname" property="coinname" />
+	</resultMap>
+	
+	<select id="findAllByNo" resultType="String">
+		select
+			coinname
+		from
+			favoriteCoin
+		where
+			sid=#{no}
+	</select>
+	
+	<insert id="insert">
+		insert into favoriteCoin values(#{usersid},#{coinname})
+	</insert>
+	
+	<delete id="delete">
+		delete from favoriteCoin
+		where
+			usersid=#{usersid} and coinname=#{coinname}
+	</delete>
+	
+</mapper>

@@ -1,6 +1,7 @@
 @charset "UTF-8";
 html, body{
 	font-family: '맑은 고딕' !important;
+	font-size: 14px;
 	height: 100%;
 }
 a:link { color: #ddd; text-decoration: none;}
@@ -79,7 +80,6 @@ tr.initASKtr td:nth-child(3), tr.initBIDtr td:nth-child(3){ border-right: none !
 
 table#askTable, table#bidTable{
 	width: 100%;
-	font-size: 16px;
 	background: #1a2436;
 	border-collapse: collapse;
 }
@@ -142,8 +142,8 @@ div#barAsk, div#barAsk-item{
 }
 div#coinItemRight{
 	align-items: center;
+	padding-top: 4px;
 }
-
 
 div#infoL{
 	background: #091325;
@@ -160,18 +160,23 @@ span#bidVolumeSpan-item{ text-align: left; line-height: 100%; }
 span#askVolumeSpan-item{ text-align: right; line-height: 100%; }
 
 div.coinItem{
-	border: 1px solid white;
+	border: 1px solid rgba(190, 190, 190,0.5);
 	border-radius: 4px;
 	
 	background: #091325;
 	height: 50px;
 	
 	align-items: center;
+	
+	padding-top: 2px;
 }
 div.coinItem span{
-	line-height: 50px;
 	color: #eee;
 }
+div.coinItem span.marketName, div.coinItem span.marketName{
+	line-height: 22px !important;
+}
+
 #infoToggle{
 	display: none;
 }
