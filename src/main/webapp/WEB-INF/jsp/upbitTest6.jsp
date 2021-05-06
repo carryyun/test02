@@ -6,14 +6,23 @@
 <head>
 <meta charset="UTF-8">
 <title>Insert title here</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6" crossorigin="anonymous">
 <!--
 [21-05-05]css를 분리시켜둔경우 수정후 바로 적용되지 않을 수 있다. 이는 브라우저 캐시에서 읽기때문이다.
 따라서 브라우저가 새로운css라고 인식하도록 뒤에?after같은 문자열을 붙인다 꼭after일 필요는없이 문자가 붙으면 된다. 
 
 배포할때는 적용안되지만 CTRL+SHIF+R을 하면 캐시까지 초기화하는 새로고침이 된다.
 -->
+
+<!-- 차트에 필요한js -->
+<script src="https://code.highcharts.com/stock/highstock.js"></script>
+<script src="https://code.highcharts.com/stock/modules/data.js"></script>
+<script src="https://code.highcharts.com/stock/modules/drag-panes.js"></script>
+<!-- 차트를 그림저장, 인쇄 시켜주는모듈 -->
+<!-- <script src="https://code.highcharts.com/stock/modules/exporting.js"></script> -->
+
+
 <link href="/resources/css/globalCSS.css?abc" rel="stylesheet"> 
+<link href="/resources/css/bootstrap.css?abc" rel="stylesheet"> 
 </head>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
@@ -24,29 +33,81 @@
 	<div class="container">
 		<input type="text" id="testInput1"> <input type="text" id="testInput2">
 		<button onclick="Test(this)">Go!</button> <button onclick="addItem(this)">ADDITEM!</button>
-		
-		<div class="row" id="coinList">
-			
-		</div>
-		
 		<div class="row">
-			<div class="col-md-6">
+			<div class="colmar-md-9 me-3">
+				<!-- infoToggle을 다시 고정형으로 변경함. ID는 그냥 그대로사용하기로 -->
+				<div class="row" id="infoToggle">
+					<div id="infoL" class="col-md-12">
+						<div class="row">
+						
+							<!-- infoDiv의 왼쪽 [테이블]-->
+							<div class="col-md-5 d-inline-block">
+							
+								<table id="bidTable" class="bidTable">
+									<thead></thead>
+									<tbody id="bidTableBody"></tbody>
+								</table>
+								<table id="askTable">
+									<thead></thead>
+									<tbody id="aksTableBody"></tbody>
+								</table>
+							</div>
+							
+							<!-- infoDiv의 오른쪽 -->
+							<div class="col-md-7 d-inline-block nolp">
+								<!-- infoDiv의 오른쪽 [코인이름] -->
+								<div class="col-md-12 nop">
+									<span id="tableCoinName"></span>
+								</div>
+								
+								<!-- infoDiv의 오른쪽 [그래프] -->
+								<div id="barWrap" class="col-md-12 d-inline-block">
+									<div id="barBid">
+									</div>
+									<div id="barAsk" class="d-inline-block">
+									</div>
+								</div>
+								
+								<!-- infoDiv의 오른쪽 [거래량] -->
+								<div class="col-md-12 d-flex nop">
+									<span id="bidVolumeSpan" class="col-md-6 text-left nop"></span>
+									<span id="askVolumeSpan" class="col-md-6 text-right nop"></span>
+								</div>
+								
+								<!-- infoDiv의 오른쪽 [차트] -->
+								<div id="chart" class="col-md-12 nop">
+									
+								</div>
+								
+							</div>
+						
+						</div>
+					
+					</div>
 			
+				</div>
 			</div>
-			<div class="col-md-6">
 			
+			<div class="col-md-3">
+				<div class="row" id="coinList">
+				
+				</div>
 			</div>
 		</div>
-		
+		<div class="row">
+			<div class="col-md-12">
+				
+			</div>
+		</div>
 	</div>	
 	
 	
 	<!-- [21-05-04] 리스트에 추가할 아이템 복제용 -->
 	<div id="hiddenitemCode" style="display: none;">
-		<div id="coinN" class="col-md-3 coinItem" onclick="coinClick(this)">
+		<div id="coinN" class="col-md-12 coinItem" onclick="coinClick(this)">
 				<div class="row" id="itemToggle">
 					<div class="col-md-3">
-						<span class="marketName"></span>
+						<span class="marketName"></span><br>
 						<span class="marketPrice">10000</span>
 					</div>
 					<div id="coinItemRight" class="col-md-9 d-flex-wrap">
@@ -65,53 +126,6 @@
 				<div class="abc"></div>
 			</div>
 	</div>
-	<!-- [21-05-05] infoToggle분리 -->
-	<div class="row" id="infoToggle">
-				<div id="infoL" class="col-md-12">
-					<div class="row">
-					
-						<!-- infoDiv의 왼쪽 [테이블]-->
-						<div class="col-md-6 d-inline-block">
-						
-							<table id="bidTable" class="bidTable">
-								<thead></thead>
-								<tbody id="bidTableBody"></tbody>
-							</table>
-							<table id="askTable">
-								<thead></thead>
-								<tbody id="aksTableBody"></tbody>
-							</table>
-						</div>
-						
-						<!-- infoDiv의 오른쪽 -->
-						<div class="col-md-6 d-inline-block nolp">
-							
-							<!-- infoDiv의 오른쪽 [코인이름] -->
-							<div class="col-md-12 nop">
-								<span id="tableCoinName"></span>
-							</div>
-							
-							<!-- infoDiv의 오른쪽 [그래프] -->
-							<div id="barWrap" class="col-md-12 d-inline-block">
-								<div id="barBid">
-								</div>
-								<div id="barAsk" class="d-inline-block">
-								</div>
-							</div>
-							
-							<!-- infoDiv의 오른쪽 [거래량] -->
-							<div class="col-md-12 d-flex nop">
-								<span id="bidVolumeSpan" class="col-md-6 text-left nop"></span>
-								<span id="askVolumeSpan" class="col-md-6 text-right nop"></span>
-							</div>
-							
-						</div>
-					
-					</div>
-				
-				</div>
-		
-			</div>
 	
 	<div class="pushFooter"></div>
 </div>
@@ -126,9 +140,6 @@
 let arrAskId = new Array();
 let arrBidId = new Array();
 
-//21-05-03 코인별로 거래량을 받아서 매수,매도 그래프를 그릴때 사용해볼까함...
-let XRPTotalVolume=0;
-let XRPBidVolume=0;
 let coinMap= new Map();
 
 //[21-05-04] 리스트 체결내역 ID를 저장하기위한 배열과 맵.
@@ -145,11 +156,6 @@ let tableTimer="";
 
 //[21-05-04] 컨트롤러에서 받아오는 리스트로 초기화시킴. 갯수에따라 조절하도록 html쪽도 수정해야함
 let initListName = ${favCoin};
-//[21-05-05] infoToggle을 밖으로 분리시키기위해 처음 상태를 담는 변수
-//			 처음상태는 부모노드가 따로 없이 숨겨두므로
-//			 코인아이템의 class를 바꾸고, display를 조정하는 등의 현재 작동방식을 스킵하기위해
-//			 변수의 초기상태는 false로 한번이라도 작동을 하게되면 이후로는 true상태가 유지되게 설계.
-let toggleStat=false;
 
 //[21-05-05] 금액별 거래량필터를 설정하기위한 변수
 let volumeFilter=100000;
@@ -171,6 +177,7 @@ let coin= function(name, price, bidVolume, totalVolume){
 }
 
 //[21-05-05] 현재 클릭되어있는 아이템이 무엇인지 적용
+let curItem="";
 
 $(function() {
     const wrap =  document.getElementsByClassName('wrap');
@@ -184,14 +191,18 @@ $(function() {
     let index=1;
 	if(initListName.length>0){
 		initListName.forEach(i => {
-			if(tradeTimerMap.get(i) != 'undefined')
-	    	addItem(); // html 넣기.
-	    	setItem(i); // 업비트 api 타이머 시작.
-	    	addListItem(i, index); // 거래량 타이머 시작
-	    	index++;
+			if(tradeTimerMap.get(i) != 'undefined'){
+				if(index==1){
+					initChart(i);
+					tableTimer = setTimeout("setUpbitData(\'"+i+"\')", tableInterval);
+				}
+		    	addItem(); // html 넣기.
+		    	setItem(i); // 업비트 api 타이머 시작.
+		    	addListItem(i, index); // 거래량 타이머 시작
+		    	index++;
+			}
 	    });
 	}
-    
 });
 
 function addItem(){
@@ -200,6 +211,11 @@ function addItem(){
 	var num = Number(coinList.children().length)+1;
 	var copyItem = tempItem.clone();
 	copyItem.attr('id','coin'+num);
+	//리스트의 1번 아이템이면 selectedItem 클래스를 추가로 넣는다. 
+	if(num==1){
+		copyItem.attr('class','col-md-12 coinItem selectedItem');
+		curItem='coin'+num;
+	}
 	copyItem.css('display','block');
 	coinList.append(copyItem);
 }
@@ -224,33 +240,10 @@ function Test(item){
 
 //21-05-03 기존 체결표와 거래량을 아이템 안에 넣어두고, 아이템 클릭하면 크기가 변하도록 하기위해 onClick이벤트.
 function coinClick(item){
- 	
-	//코인 상세정보(infoToggle)가 어디에 출력되는가에 상관없이 초기화부터 시켜줌.
-	document.getElementById('infoToggle').style.display="none";
-	
-	//[21-05-05] 초기상태는 infoToggle을 밖으로 분리시켰기 때문에 coinItem의 크기를 변경 할 필요가 없다. 그 이후로만 실행되도록.
-	if(toggleStat){
-		//코인 상세정보(infoToggle)를 다시 옮기기전에 이전에 있던 아이템div의 크기를 원래대로 돌리고, display속성도 원래대로 돌림.
-		document.getElementById('infoToggle').parentNode.parentNode.className="col-md-3 coinItem";
-		document.getElementById('infoToggle').parentNode.parentNode.style.height="50px";
-		document.getElementById('infoToggle').parentNode.parentNode.childNodes[1].style.display="flex";
-	}else{
-		toggleStat=true;
-	}
-
-	//코인 상세정보(infoToggle) div를 잘라내서 클릭한 아이템의 div로 붙여넣기함
-	let deta = $('#infoToggle').detach();
-	$("#" + item.id + " .abc").append(deta);
-	
-	//아이템 누를때마다 토글처리
-	let nodes = document.getElementById(item.id).childNodes;
-	if(document.getElementById('infoToggle').style.display == 'none'){
-		item.className="col-md-6 coinItem order-first";
-		item.style.height="100%";
-		nodes[3].style.display="block";
-		document.getElementById('infoToggle').style.display="flex";
-		nodes[1].style.display="none";
-	}
+	if(curItem==item.id) return;
+	//아이템 누를때마다 토글처리 => [21-05-05] 항목을 숨기지 않고 강조표시로 변경함
+	if(curItem!="")	document.getElementById(curItem).className="col-md-12 coinItem";
+	item.className="col-md-12 coinItem selectedItem";
 	
 	//[21-05-04] 재귀함수 호출을 중지시킨 후 선택된 코인의 이름으로 조회 시작
 	initTable();
@@ -258,6 +251,8 @@ function coinClick(item){
 	//[21-05-04] 클릭한 코인의 코인명을 가져옴
 	tableCoinName=$('#'+item.id+" .marketName").html()
 	
+	curItem=item.id;
+	initChart(tableCoinName);
 	tableTimer = setTimeout("setUpbitData(\'"+tableCoinName+"\')", tableInterval);
 }
 
@@ -294,6 +289,8 @@ function setItem(coinName){
        		const volume=Math.floor(item.trade_volume);
        		//매수매도 구분
        		const askbid=item.ask_bid;
+       		//코인가격
+       		tmpCoin.price=item.trade_price;
        		
    			// - 21-05-03 비교방식변경 => 체결내역에 고유한 ID가 있었음 그걸 이용해 비교.
        		if( (askbid=='ASK') && (arrAskIdList.indexOf(checkId) == -1) ){
@@ -341,7 +338,6 @@ function setItem(coinName){
 	//[21-05-05] 아이템의 업비트API 타이머를 담는 맵. => 아이템 삭제시 타이머를 중지시키기 위해 필요.
 	tradeTimerMap.set(coinName, setTimeout("setItem(\'"+ coinName +"\')", 1000) );
 }
-
 //[21-05-04] 코인리스트 아이템의 값을 넣어주는 함수
 function addListItem(coinName, num){
 	coinName=coinName.toUpperCase();
@@ -349,6 +345,9 @@ function addListItem(coinName, num){
 	span.html(coinName);
 	
 	if( coinMap.get(coinName) != undefined && coinMap.get(coinName) != undefined ){
+		
+		let span2=$('#coin'+ num +' .marketPrice');
+		span2.html( addComma(coinMap.get(coinName).price) );
 		
 		let totalVolume=Number(coinMap.get(coinName).totalVolume);
 		let bidVolume=Number(coinMap.get(coinName).bidVolume);
@@ -370,8 +369,6 @@ function addListItem(coinName, num){
 	//[21-05-05] 아이템의 정보갱신 타이머를 담는 맵. => 아이템 삭제시 타이머를 중지시키기 위해 필요.
 	updateTimerMap.set(coinName, setTimeout('addListItem(\"'+coinName+ '\",\"' +num+'\")', 1000));
 	
-	// [21-05-05] 기능 추가후 주석처리 다음버전에서 *삭제*.
-	// setTimeout('addListItem(\"'+coinName+ '\",\"' +num+'\")', 1000 );
 }
 
 
@@ -427,9 +424,9 @@ function setUpbitData(coinName){
        		}else{
        			volume=Math.floor(item.trade_volume);
        		}
-       		
        		//가격
        		const price=item.trade_price;
+       		tmpCoin.price=price;
        		//매수매도 구분
        		const askbid=item.ask_bid;
        		
@@ -471,8 +468,8 @@ function setUpbitData(coinName){
    	      		tmpCoin.totalVolume += Math.floor(volume);
    	      		
    	        	//N(7)줄이 넘어가면 첫번째 행 삭제
-   	        	if(asktable.tBodies[0].rows.length >7){
-   	        		asktable.deleteRow(7);
+   	        	if(asktable.tBodies[0].rows.length >8){
+   	        		asktable.deleteRow(8);
    	        	}
        			
    	        	
@@ -519,7 +516,7 @@ function setUpbitData(coinName){
    	        	tmpCoin.bidVolume+=Number(Math.floor(volume));
    	        	
    	        	//N(7)줄이 넘어가면 첫번째 행 삭제
-   	        	if(bidtable.tBodies[0].rows.length >7){
+   	        	if(bidtable.tBodies[0].rows.length >8){
    	        		bidtable.deleteRow(0);
    	        	}
        		}
@@ -580,7 +577,7 @@ function initTable(){
     // - 값을 -로 넣어둔 이유는 테이블의 모양이 바로 잡혀있도록 하기 위해.
     const initAskTable =  document.getElementById('askTable');
 	const initBidTable =  document.getElementById('bidTable');
-	for(var i=0; i<7; i++){
+	for(var i=0; i<8; i++){
 		const initAskRow = initAskTable.insertRow();
 		initAskRow.className = 'initASKtr';
 		const initAskNewCell1 = initAskRow.insertCell(0);
@@ -599,10 +596,10 @@ function initTable(){
        	const initBidNewCell3 = initBidRow.insertCell(2);
        	initBidNewCell3.innerText = '-';
        	
-       	if(initBidTable.tBodies[0].rows.length >7){
+       	if(initBidTable.tBodies[0].rows.length >8){
        		initBidTable.deleteRow(0);
        	}
-       	if(initAskTable.tBodies[0].rows.length >7){
+       	if(initAskTable.tBodies[0].rows.length >8){
        		initAskTable.deleteRow(0);
        	}
 	}
@@ -611,7 +608,149 @@ function initTable(){
 function addComma(num){
 	return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
-     
+
+function initChart(coinName){
+	Highcharts.setOptions({
+	    global : { 
+	        useUTC : false
+	        // timezoneOffset: -9 * 60
+	    }
+	    ,xAxis : {
+		      type: 'datetime',
+		      dateTimeLabelFormats: { // don't display the dummy year
+		    	 millisecond: '%H:%M',
+		    	 second: '%H:%M',
+		    	 minute: '%H:%M',
+		    	 hour: '%H:%M',
+		    	 day: '%e. %b',
+	    	     week: '%e. %b',
+		         month: '%e. %b',
+		         year: '%b'
+		      },
+		      title: {
+		         text: 'Date'
+		      }
+		}
+	    
+	}); 
+
+	let chartData = "";
+	const options = {method: 'GET'};
+	fetch('https://api.upbit.com/v1/candles/minutes/1?market=KRW-'+coinName+'&count=200', options)
+	  .then(response => response.json())
+	  .then(response => {
+		  chartData= response;
+		  let marketName=chartData[0].market;	 
+		  
+		    // split the data set into ohlc and volume
+		    // 가격정보와 볼륨을 나눠서 저장하는부분이지만, 볼륨이 없는 차트를 사용해서 가격정보만 나눔.
+		    var ohlc = [];
+		    dataLength = chartData.length;
+		    // set the allowed units for data grouping
+		    // 순서 - timestamp, open, high, low, close
+		    // 업비트는 최근거부터 넘겨주기때문에 for문을 반대로 돌려서 넣어야함 
+		    for ( let i=dataLength-1; i >= 0; i-- ) {
+	    		ohlc.push([
+		        	chartData[i].timestamp, // the date
+		            chartData[i].opening_price, // open
+		            chartData[i].high_price, // high
+		            chartData[i].low_price, // low
+		            chartData[i].trade_price // close
+		        ]);
+		    }
+		    // create the chart
+		    Highcharts.stockChart('chart', {
+/* 		        title: {
+		            text: marketName
+		        }, */
+		        xAxis: {
+		        	//축에 맞춰 캔들을 그림
+        			tickmarkPlacement: 'on',
+        			//x좌표의 넓이조절
+        			width:'91%'
+		        },
+		        yAxis: {
+		            labels: {
+		                align: 'left',
+		                x: -30,
+		                y: 0
+		            }
+		        },
+		        chart: {
+		            marginLeft: 20,
+		            marginRight: 20,
+		            height: 350
+		        },
+		        
+		        rangeSelector: {
+		            buttons: [{
+		                type: 'minute',
+		                count: 10,
+		                text: '10m'
+		            },{
+		                type: 'hour',
+		                count: 1,
+		                text: '1h'
+		            },{
+		                type: 'all',
+		                count: 1,
+		                text: 'All'
+		            }],
+		            selected: 2,
+		            inputEnabled: false
+		        },
+		        plotOptions: {
+	                candlestick: {
+	                    downColor: 'blue',
+	                    upColor: 'red'
+	                }
+	            },
+		        series: [{
+		            name: marketName,
+		            type: 'candlestick',
+		            data: ohlc,
+		            
+		            tooltip: {
+		            	headerFormat: '{point.x:%m:%d %H:%M}'
+		            }
+		        }],
+		        //툴팁을 좌상단에 고정시킴
+		        tooltip: {
+		            shape: 'square',
+		            headerShape: 'callout',
+		            borderWidth: 0,
+		            shadow: false,
+		            positioner: function (width, height, point) {
+		                var chart = this.chart,
+		                    position;
+
+		                if (point.isHeader) {
+		                    position = {
+		                        x: Math.max(
+		                            // Left side limit
+		                            chart.plotLeft,
+		                            Math.min(
+		                                point.plotX + chart.plotLeft - width / 2,
+		                                // Right side limit
+		                                chart.chartWidth - width - chart.marginRight
+		                            )
+		                        ),
+		                        y: point.plotY
+		                    };
+		                } else {
+		                    position = {
+		                        x: point.series.chart.plotLeft,
+		                        y: point.series.yAxis.top - chart.plotTop
+		                    };
+		                }
+
+		                return position;
+		            }
+		        },
+		    });
+	  }).catch(err => console.error(err));
+}
+
 </script>
 </body>
 

@@ -25,7 +25,30 @@ public class TestController {
     }
 
     
-    //[21-05-05]작업
+    //[21-05-06]작업 - 
+    @RequestMapping("/upbitTest6")
+    public void upbitTest6(Model model) throws JsonProcessingException {
+        List<String> list = new ArrayList<String>(favoriteCoinService.listByNo(1));
+        
+        ObjectMapper mapper = new ObjectMapper();
+        String favCoin=mapper.writeValueAsString(list);
+        
+        model.addAttribute("favCoin", favCoin);
+    }
+    
+    //[21-05-05]작업 - infoToggle과 coinList를 반씩 나누어서 표현하기로 해봄.
+    @RequestMapping("/upbitTest5")
+    public void upbitTest5(Model model) throws JsonProcessingException {
+        List<String> list = new ArrayList<String>(favoriteCoinService.listByNo(1));
+        
+        ObjectMapper mapper = new ObjectMapper();
+        String favCoin=mapper.writeValueAsString(list);
+        
+        model.addAttribute("favCoin", favCoin);
+    }
+    
+    //[21-05-05]작업 - 작업 중 infoToggle을 왼쪽에 고정하는 방식으로 변경해보게 되어서 페이지를 넘김
+    //                CSS도 바꾸게되어서 다시 열어보려면 jsp의 CSS를 globalCSS_Test5_before로 바꿔줘야함
     @RequestMapping("/upbitTest4")
     public void upbitTest4(Model model) throws JsonProcessingException {
         List<String> list = new ArrayList<String>(favoriteCoinService.listByNo(1));

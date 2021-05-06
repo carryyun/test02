@@ -39,9 +39,6 @@ a:hover { color: #fff; text-decoration: none;}
 	height: 250px;
 	background: #091325;
 	width: 100%;
-/* 	position: fixed;
-	bottom: 0;
-	margin-top: 20px; */
 }
 
 .footer section p:nth-child(1){
@@ -176,7 +173,9 @@ div.coinItem span{
 div.coinItem span.marketName, div.coinItem span.marketName{
 	line-height: 22px !important;
 }
+div.selectedItem{
+	background: #888;
+}
 
 #infoToggle{
-	display: none;
 }
