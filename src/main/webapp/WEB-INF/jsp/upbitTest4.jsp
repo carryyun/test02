@@ -13,7 +13,7 @@
 
 배포할때는 적용안되지만 CTRL+SHIF+R을 하면 캐시까지 초기화하는 새로고침이 된다.
 -->
-<link href="/resources/css/globalCSS.css?abc" rel="stylesheet"> 
+<link href="/resources/yun/cms/css/globalCSS.css?abc" rel="stylesheet"> 
 </head>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 

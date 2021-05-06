@@ -21,8 +21,8 @@
 <!-- <script src="https://code.highcharts.com/stock/modules/exporting.js"></script> -->
 
 
-<link href="/resources/css/globalCSS.css?abc" rel="stylesheet"> 
-<link href="/resources/css/bootstrap.css?abc" rel="stylesheet"> 
+<link href="/resources/yun/cms/css/globalCSS.css?abc" rel="stylesheet"> 
+<link href="/resources/yun/cms/css/bootstrap.css?abc" rel="stylesheet"> 
 </head>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
