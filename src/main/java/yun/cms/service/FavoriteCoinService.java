@@ -5,6 +5,6 @@ import yun.cms.dto.FavoriteCoin;
 
 public interface FavoriteCoinService {
     List<String> listByNo(int no);
-    FavoriteCoin insert(FavoriteCoin favoriteCoin);
+    int insert(FavoriteCoin favoriteCoin);
     int delete(FavoriteCoin favoriteCoin);
 }

@@ -3,7 +3,15 @@ package yun.cms.dto;
 public class FavoriteCoin {
     private int usersid;
     private String coinname;
-    
+
+    public FavoriteCoin(int usersid, String coinname) {
+        this.usersid = usersid;
+        this.coinname = coinname;
+    }
+    public FavoriteCoin() {
+    }
+
+
     public Integer getUsersid() {
         return usersid;
     }

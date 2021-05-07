@@ -22,9 +22,8 @@
 <!-- 차트를 그림저장, 인쇄 시켜주는모듈 -->
 <!-- <script src="https://code.highcharts.com/stock/modules/exporting.js"></script> -->
 
-
-<link href="/resources/yun/cms/css/globalCSS.css?abc" rel="stylesheet"> 
-<link href="/resources/yun/cms/css/bootstrap.css?abc" rel="stylesheet"> 
+<link href="/resources/yun/cms/css/globalCSS.css?a" rel="stylesheet"> 
+<link href="/resources/yun/cms/css/bootstrap.css?b" rel="stylesheet"> 
 </head>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
@@ -34,7 +33,7 @@
 
 	<div class="container">
 	
-		<div style="display: inline-block;">
+		<div style="display: none;">
 			<input type="text" id="testInput1"> <input type="text" id="testInput2">
 			<button onclick="Test(this)">Go!</button> <button onclick="addItem(this)">ADDITEM!</button>
 		</div>
@@ -128,11 +127,25 @@
 			</div>
 		</div>
 	</div>	
+	<style>
+	.removeItemBtn{
+		color: red !important;
+		position: relative;
+		visibility: hidden;
+		left: 245px;
+	    top: -8px;
+	    opacity: 0.7;
+	}
+	.removeItemBtn:hover {
+		color: #eee !important;
+	}
 	
+	</style>
 	
 	<!-- [21-05-04] 리스트에 추가할 아이템 복제용 -->
 	<div id="hiddenitemCode" style="display: none;">
 		<div id="coinN" class="col-md-12 coinItem" onclick="coinClick(this)">
+		<div style="position:absolute; visibility: hidden"><a class="removeItemBtn fs-11" href="#" onclick="removeItem(this, event)"><i class="fas fa-trash-alt"></i></a></div>
 				<div class="row" id="itemToggle">
 					<div class="col-md-3">
 						<span class="marketName"></span><br>
@@ -164,23 +177,15 @@
 <script type="text/javascript">
 
 //Ver.5
-//0506이전버전 주요사항: 코인리스트 여러개 출력 / 헤더,풋터 틀잡기 / 리스트의 아이템 클릭시 토글기능[coinList의 내용비움, infoToggle도 분리]
-//					코인리스트에 아이템 추가시 중복인지 체크해야함, 코인리스트 infoToggle이 열리더라도 보기좋게 그리드수정, infoToggle 내용보강
-//[21-05-06] 이번버전 주요사항: 코인상세정보 채우기, 
+//0507이전버전: 코인리스트 여러개 출력 / 헤더,풋터 틀잡기 / 리스트의 아이템 클릭시 토글기능[coinList의 내용비움, infoToggle도 분리]
+//					코인리스트에 아이템 추가시 중복인지 체크해야함, 코인리스트 infoToggle이 열리더라도 보기좋게 그리드수정, infoToggle 내용보강,
+//					코인상세정보 채우기
+//[21-05-07] 이번버전 주요사항: 
 
-
-let arrAskId = new Array();
-let arrBidId = new Array();
-
-let coinMap= new Map();
-
-//[21-05-04] 리스트 체결내역 ID를 저장하기위한 배열과 맵.
-//            - 임시로 어레이를 사용했는데 추후 볼륨을 저장한 방식과 동일하게 맵으로 변경해야함.
-//[21-05-06] *해결필요* 맵으로 변경해야하는이유 => 코인별로 리스트를 따로 사용하게 해야 정확하게 구분이 가능함.
-//           현재는 임시방편으로 체결ID 저장갯수를 500개로 늘려둠
-let arrAskIdList = new Array();
-let arrBidIdList = new Array();
-let arrIdMap= new Map();
+	
+//[21-05-07] 체결내역의 유일성을 검증할 때 사용하는 Array를 Map에 저장하여 코인별로 사용 가능하도록 수정
+let askIdMap=new Map();
+let bidIdMap=new Map();
 
 //[21-05-04] tableCoinName = 체결테이블의 코인이름을 저장해두기 위한 변수. 수정이 필요할 것 같음 
 //			 tableTimer    = 재귀함수를 담아두었다가 종료를 시키기위한 변수
@@ -211,9 +216,12 @@ let coin= function(name, price, bidVolume, totalVolume){
 	this.bidVolume = bidVolume;
 	this.totalVolume = totalVolume;
 }
+let coinMap= new Map();
 
 //[21-05-05] 현재 클릭되어있는 아이템이 무엇인지 적용
 let curItem="";
+
+
 
 $(function() {
     const wrap =  document.getElementsByClassName('wrap');
@@ -235,12 +243,26 @@ $(function() {
 		    	setItem(i); // 업비트 api 타이머 시작.
 		    	addListItem(i, index); // 거래량 갱신 타이머 시작
 		    	index++;
-			}
+			}	
 	    });
 	}
 	//[21-05-06] 코인의 누적된 거래량을 일정량씩 삭제해주는 함수.
 	burn();
+	
+	//[21-05-07] 리스트 아이템삭제에 쓰일 휴지통아이콘 visibility toggle기능
+	let coinItems = document.getElementsByClassName("coinItem");
+	for(let item of coinItems){
+		item.addEventListener("mouseenter", e => {
+			$("#"+item.id + " .removeItemBtn").css('visibility','visible');
+		});
+		item.addEventListener("mouseleave", e => {
+			/* event.stopPropagation(); */
+			$("#"+item.id + " .removeItemBtn").css('visibility','hidden');
+		});
+		
+	}
 
+	
 	//[21-05-06] 코인검색 input을 클릭하면 클리어버튼이 보이고 아웃포커스될때 클리어버튼이 사라지게
 	document.getElementById("serchCoinText").addEventListener("focusout", e => {
 		  
@@ -251,7 +273,42 @@ $(function() {
 	document.getElementById("serchCoinText").addEventListener("focus", e => {
 		  $('#clearBtn').css('display','inline-block');
 	});
+	
+	//[21-05-07] 검색기능 추가
+	document.getElementById("serchCoinText").addEventListener("keyup", e => {
+		let cnt=$('#coinList').children().length;
+		let input=$("#serchCoinText").val().toUpperCase();
+		if(input == ""){
+			for(let i=1; i<cnt+1; i++){
+				$('#coin'+i).css('display','block');
+			}
+			return;
+		}
+		for(let i=1; i<cnt+1; i++){
+			item=$('#coin'+i+" .marketName").html();
+			if(item.indexOf(input) != -1){
+				$('#coin'+i).css('display','block');
+			}else{
+				$('#coin'+i).css('display','none');
+			}
+		}
+	});
 });
+
+function testInsert(){
+	$.ajax({
+		url: "testInsert.do",
+		type: "POST",
+		success: function(data){
+			console.log("완료");
+		},
+		error: function(err){
+			console.log(err);
+		}
+	});
+	
+}
+
 
 
 function Test(item){
@@ -266,12 +323,36 @@ function Test(item){
 		//[21-05-05] *해결필요* 테스트용 메시지박스 삭제해야함
 		alert("중복된 코인입니다.");
 	}
-	
-	//*해결필요* 타이머 멈추는 기능 완성된코드로 옮겨놔야함
-	// clearTimeout(timerMap.get('DOGE'));
 }
 
 function serchClear(){ $('#serchCoinText').val(""); $('#clearBtn').css('display','none'); }
+
+function removeItem(item, e){
+	e.stopPropagation();
+	
+	let getId=item.parentNode.parentNode.id;
+	let getCoinName=$('#'+getId+" .marketName").html();
+	
+	let i={"usersid":"1" ,"coinname" : getCoinName};
+	$.ajax({
+		url: "favRemove.do",
+		data: JSON.stringify(i),
+		dataType:"json",
+		contentType: 'application/json',
+		type: "POST",
+		success: function(data){
+			console.log("success");
+			console.log(data);
+        }
+	});
+	
+	//[21-05-07] 삭제기능 임시로 display로 숨기기만 해둠
+	item.parentNode.parentNode.remove();
+	
+	//*해결필요* 타이머 멈추는 기능 완성된코드로 옮겨놔야함[삭제기능]
+	clearTimeout(tradeTimerMap.get(getCoinName));
+	clearTimeout(updateTimerMap.get(getCoinName));
+}
 
 function addItem(){
 	var coinList = $('#coinList');
@@ -299,12 +380,12 @@ function burn(){
 		let c = new coin("",0,0,0);
 		c=coinMap.get(getKey);
 		
-		c.totalVolume-= (c.totalVolume*0.3);
-		c.bidVolume-= (c.bidVolume*0.3);
+		c.totalVolume-= (c.totalVolume*0.2);
+		c.bidVolume-= (c.bidVolume*0.2);
 		coinMap.set(getKey,c);
 	}
-	console.log("==============================")
-	setTimeout(burn,10000);
+	
+	setTimeout(burn,5000);
 }
 
 //21-05-03 기존 체결표와 거래량을 아이템 안에 넣어두고, 아이템 클릭하면 크기가 변하도록 하기위해 onClick이벤트.
@@ -349,6 +430,13 @@ function setItem(coinName){
 		tmpCoin = coinMap.get(coinName);
 	}
 	
+	//[21-05-07] 체결ID를 모두 동일한 Array에 보관했었으나, 코인별 Array를 Map에 담아서 보관하도록 수정
+	let askIdArr=new Array();
+	let bidIdArr=new Array();
+	
+	if( askIdMap.get(coinName) != undefined ) askIdArr = askIdMap.get(coinName);
+	if( bidIdMap.get(coinName) != undefined ) bidIdArr = bidIdMap.get(coinName);
+	
 	arrResult.forEach(item => {
 		
 		if(item.trade_volume>=tmpVol){
@@ -366,28 +454,25 @@ function setItem(coinName){
        		//코인가격
        		tmpCoin.price=item.trade_price;
        		tmpCoin.name=coinName;
-   			// - 21-05-03 비교방식변경 => 체결내역에 고유한 ID가 있었음 그걸 이용해 비교.
-       		if( (askbid=='ASK') && (arrAskIdList.indexOf(checkId) == -1) ){
-       			if(arrAskIdList.length>500){
-       				arrAskIdList.shift();
+   			// 21-05-03 비교방식변경 => 체결내역에 고유한 ID가 있었음 그걸 이용해 비교.
+   			// 21-05-04 코인이름에따라 변수명이 달라짐. 하지만 변수선언할 때 이름에 변수를 사용 할 수 없음.
+   	        //  - map을 활용해 변수명대신 키값으로 사용. 키값에는 변수를 사용할 수 있음. 값에는 tmpCoin을 저장시킴 
+       		if( (askbid=='ASK') && (askIdArr.indexOf(checkId) == -1) ){
+       			if(askIdArr.length>500){
+       				askIdArr.shift();
        			}
-   	        	arrAskIdList.push(checkId);
-   	        	
-   	      		// 21-05-04 코인이름에따라 변수명이 달라짐. 하지만 변수선언할 때 이름에 변수를 사용 할 수 없음.
-   	        	//  - map을 활용해 변수명대신 키값으로 사용. 키값에는 변수를 사용할 수 있음.
+       			askIdArr.push(checkId);
+   	      		
    	        	if(tmpCoin.totalVolume==undefined){
    	        		tmpCoin.totalVolume='0';
    	        	}
    	        	tmpCoin.totalVolume += Number(volume);
    	        	
-       		}else if( (askbid=='BID') && (arrBidIdList.indexOf(checkId) == -1) ){
-       			if(arrBidIdList.length>500){
-       				arrBidIdList.shift();
+       		}else if( (askbid=='BID') && (bidIdArr.indexOf(checkId) == -1) ){
+       			if(bidIdArr.length>500){
+       				bidIdArr.shift();
        			}
-   	        	arrBidIdList.push(checkId);
-   	        	
-   	        	// 21-05-04 코인이름에따라 변수명이 달라짐. 하지만 변수선언할 때 이름에 변수를 사용 할 수 없음.
-   	        	//  - map을 활용해 변수명대신 키값으로 사용. 키값에는 변수를 사용할 수 있음.
+       			bidIdArr.push(checkId);
    	        	
    	        	if(tmpCoin.totalVolume==undefined){
    	        		tmpCoin.totalVolume='0';
@@ -406,9 +491,13 @@ function setItem(coinName){
        	if(tmpCoin.bidVolume==undefined){
        		tmpCoin.bidVolume='0';
        	}
-       	
 	});
 	coinMap.set(coinName,tmpCoin);
+	
+	//[21-05-07] 체결내역ID의 저장방식의 변경으로 동일한 Array를 사용하던것에서 체결ID가 담긴Array를 코인별로 Map에 저장함
+	askIdMap.set(coinName,askIdArr);
+	bidIdMap.set(coinName,bidIdArr);
+	
 	//[21-05-05] 아이템의 업비트API 타이머를 담는 맵. => 아이템 삭제시 타이머를 중지시키기 위해 필요.
 	tradeTimerMap.set(coinName, setTimeout("setItem(\'"+ coinName +"\')", 1000) );
 }
@@ -425,6 +514,7 @@ function addListItem(coinName, num){
 		
 		let totalVolume=Number(coinMap.get(coinName).totalVolume);
 		let bidVolume=Number(coinMap.get(coinName).bidVolume);
+		let askVolume=Number(totalVolume-bidVolume);
 		
 		let bar=$('#coin'+ num +' #barBid-item');
 		bar.css('width',((bidVolume/totalVolume)*100)+'%')
@@ -432,36 +522,33 @@ function addListItem(coinName, num){
 		let bidSpan=$('#coin'+ num +' #bidVolumeSpan-item');
 		let askSpan=$('#coin'+ num +' #askVolumeSpan-item');
 		let bar2=$('#coin'+ num +' #barAsk-item');
-
-		
-		
-		
-		//[21-05-06] 체결그래프의 단위 세부조정
-		if(coinName=="BTC"){
-			bidSpan.html( Number(bidVolume).toFixed(3) );
-		}else{
-			if( (bidVolume>1000000) ) bidSpan.html( (bidVolume/1000000).toFixed(2)+"M" );
-	     	else if( (bidVolume>1000) ) bidSpan.html( addComma( (bidVolume/1000).toFixed(2) )+"K" );
-	     	else bidSpan.html( addComma( Number(bidVolume).toFixed(2) ) );
-		}
-     	
-		if(coinName=="BTC"){
-			askSpan.html( Number(totalVolume-bidVolume).toFixed(3) );
-		}else{
-			if( ((totalVolume-bidVolume)>1000000) ) askSpan.html( ((totalVolume-bidVolume)/1000000).toFixed(2)+"M" );
-	     	else if( ((totalVolume-bidVolume)>1000) ) askSpan.html( addComma( ((totalVolume-bidVolume)/1000).toFixed(2) )+"K" );
-	     	else askSpan.html( addComma( Number(totalVolume-bidVolume).toFixed(2) ) );
-		}
 		
 		//[21-05-06] 그래프에 퍼센트 추가.
 		let bidPerSpan=$('#coin'+ num +' #bidVolumePerSpan-item');
 		let askPerSpan=$('#coin'+ num +' #askVolumePerSpan-item');
-		bidPerSpan.html( ( (bidVolume/totalVolume) *100 ).toFixed(1)+"%");
-		askPerSpan.html( ( ((totalVolume-bidVolume)/totalVolume) *100 ).toFixed(1)+"%");
-     	
-		//해당 내용은 다음버전에서 삭제
-		/* bidSpan.html((bidVolume/1000).toFixed(2)+"K");
-		askSpan.html(((totalVolume-bidVolume)/1000).toFixed(2)+"K"); */
+		let bidPer, askPer;
+		bidPer=( (bidVolume/totalVolume)*100 ).toFixed(1)+"%";
+		askPer=( (askVolume/totalVolume)*100 ).toFixed(1)+"%";
+		
+		bidPerSpan.html( bidPer );
+		askPerSpan.html( askPer );
+		
+		//[21-05-06] 체결그래프의 단위 세부조정
+		let bid, ask;
+		if(coinName=="BTC"){
+			bidSpan.html( bidVolume.toFixed(3) );
+			askSpan.html( askVolume.toFixed(3) );
+		}else{
+			if( (bidVolume>1000000) ) bid = (bidVolume/1000000).toFixed(2)+"M";
+	     	else if( (bidVolume>1000) ) bid = addComma( (bidVolume/1000).toFixed(2) )+"K";
+	     	else bid = addComma( Number(bidVolume).toFixed(2) );
+	     	bidSpan.html(bid + " " + bidPer);
+	     	
+	     	if( askVolume>1000000 )  ask = (askVolume/1000000).toFixed(2)+"M";
+	     	else if( askVolume>1000 ) ask = addComma( (askVolume/1000).toFixed(2) )+"K";
+	     	else ask = addComma( askVolume.toFixed(2) );
+			askSpan.html(askPer + " " +ask);
+		}
 	}
 	
 	//[21-05-04] setTimeout을 이용해 재귀함수를 사용할 때,
@@ -470,7 +557,6 @@ function addListItem(coinName, num){
 	//			coinName,num,undefined 이런식으로 매개변수를 넘기게되므로 오류가 발행한다.
 	//[21-05-05] 아이템의 정보갱신 타이머를 담는 맵. => 아이템 삭제시 타이머를 중지시키기 위해 필요.
 	updateTimerMap.set(coinName, setTimeout('addListItem(\"'+coinName+ '\",\"' +num+'\")', 1000));
-	
 }
 
 //21-05-04 체결테이블의 데이터를 계산하는 내용은 함수로 따로 빼야할 것 같음.
@@ -483,11 +569,6 @@ function setUpbitData(coinName){
 	//ASK가 낮은가격 == 아래 가격에 던졌다고 생각하면 이게 파란색 매도로 표현이 되어야한다.
 	//BID == 호가창에 제시된 매수 할 수 있는 가격
 	//ASK == 호가창에 제시된 매도 할 수 있는 가격
-	
-	//[21-05-05] 맵에 coin이라는 객체를 넣는 방식으로 변경. 다음버전에서 삭제할것 *해결필요*
-	//[21-05-04] map을 활용해 변수명대신 키값으로 사용. 키값에는 변수를 사용할 수 있음.
-	//let keyNameTotal=coinName+'TotalVolumeTable';
-    //let keyNameBid=coinName+'BidVolumeTable';
     
     //[21-05-05] coin(name, price, bidVolume, totalVolume)
     //			 기존방식= '코인이름BidVolume', '코인이름TotalVolume'이런식으로 맵에 넣어서 사용했었는데,
@@ -500,18 +581,22 @@ function setUpbitData(coinName){
     //[21-05-04] 테이블의 코인 이름을 수정해줌.
     $('#tableCoinName').html(coinName);
     
-	//**********************************
-	// 21-05-03 함수 호출시 매개변수로 코인이름 받아오도록 수정해야함 
-	//**********************************
+	//getTrade = 업비트에서 체결내역 가져오는 API를 작성해둔 함수
 	let arrResult = new Array();
 	arrResult=getTrade(coinName);
-
 	
 	//[21-05-05] 업비트API로 불러올 때 에러가 생겨 불러오지 못하면 바로 탈출하도록.
 	if(arrResult.length<1) return;
 	
 	//[21-05-05] 코인의 가격에따라 미리 설정해둔 필터값 이상의 거래만 출력되도록.
 	let tmpVol= volumeFilter/arrResult[0].trade_price;
+	
+	//[21-05-07] 체결ID를 모두 동일한 Array에 보관했었으나, 코인별 Array를 Map에 담아서 보관하도록 수정
+	let askIdArr=new Array();
+	let bidIdArr=new Array();
+	if( askIdMap.get(coinName+'Table') != undefined) askIdArr= askIdMap.get(coinName+'Table');
+	if( bidIdMap.get(coinName+'Table') != undefined) bidIdArr= bidIdMap.get(coinName+'Table');
+	
 	arrResult.forEach(item => {
 		if(item.trade_volume>=tmpVol){
        		//체결번호, 유일성체크 가능
@@ -534,9 +619,9 @@ function setUpbitData(coinName){
        		
        		// 이전 체결시간, 볼륨과 비교해 같은 주문인지 확인
    			// - 21-05-03 비교방식변경 => 체결내역에 고유한 ID가 있었음 그걸 이용해 비교.
-       		if( (askbid=='ASK') && (arrAskId.indexOf(checkId) == -1) ){
-       			if(arrAskId.length>100){
-       				arrAskId.shift();
+       		if( (askbid=='ASK') && (askIdArr.indexOf(checkId) == -1) ){
+       			if(askIdArr.length>500){
+       				askIdArr.shift();
        			}
        			
        			const asktable =  document.getElementById('askTable');
@@ -563,7 +648,7 @@ function setUpbitData(coinName){
    	        	
    	        	asknewCell4.innerText = askbid;
    	        	asknewCell5.innerText = checkId;
-   	        	arrAskId.push(checkId);
+   	        	askIdArr.push(checkId);
    	        	
    	      		// 21-05-04 코인이름에따라 변수명이 달라짐. 하지만 변수선언할 때 이름에 변수를 사용 할 수 없음.
    	        	//  - map을 활용해 변수명대신 키값으로 사용. 키값에는 변수를 사용할 수 있음.
@@ -587,10 +672,10 @@ function setUpbitData(coinName){
    	        	
    	      	// 이전 체결시간, 볼륨과 비교해 같은 주문인지 확인
     		// - 21-05-03 비교방식변경 => 체결내역에 고유한 ID가 있었음 그걸 이용해 비교.
-       		}else if( (askbid=='BID') && (arrBidId.indexOf(checkId) == -1) ){
+       		}else if( (askbid=='BID') && (bidIdArr.indexOf(checkId) == -1) ){
        			       			
-       			if(arrBidId.length>100){
-       				arrBidId.shift();
+       			if(bidIdArr.length>500){
+       				bidIdArr.shift();
        			}
        			
        			const bidtable =  document.getElementById('bidTable');
@@ -616,7 +701,7 @@ function setUpbitData(coinName){
    	        	
    	        	bidnewCell4.innerText = askbid;
    	        	bidnewCell5.innerText = checkId;
-   	        	arrBidId.push(checkId);
+   	        	bidIdArr.push(checkId);
    	        	
    	        	// 21-05-04 코인이름에따라 변수명이 달라짐. 하지만 변수선언할 때 이름에 변수를 사용 할 수 없음.
    	        	//  - map을 활용해 변수명대신 키값으로 사용. 키값에는 변수를 사용할 수 있음.
@@ -678,6 +763,9 @@ function setUpbitData(coinName){
 	});
 	coinMap.set(coinName+'Table',tmpCoin);
 	
+	//[21-05-07] 체결내역ID의 저장방식의 변경으로 동일한 Array를 사용하던것에서 체결ID가 담긴Array를 코인별로 Map에 저장함
+	askIdMap.set(coinName+'Table',askIdArr);
+	bidIdMap.set(coinName+'Table',bidIdArr);
 	
 	//[21-05-06] 코인상세정보에 필요한 코인가격의 세부정보를 가져옴.
 	let options = {method: 'GET'};

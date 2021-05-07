@@ -19,7 +19,7 @@ public class FavoriteCoinServiceImpl implements FavoriteCoinService {
     }
 
     @Override
-    public FavoriteCoin insert(FavoriteCoin favoriteCoin) {
+    public int insert(FavoriteCoin favoriteCoin) {
         return favoriteCoinDAO.insert(favoriteCoin);
     }
 

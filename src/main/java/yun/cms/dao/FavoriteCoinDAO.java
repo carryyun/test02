@@ -6,6 +6,6 @@ import yun.cms.dto.FavoriteCoin;
 public interface FavoriteCoinDAO {
     List<String> findAllByNo(int no);
     
-    FavoriteCoin insert(FavoriteCoin favoriteCoin);
+    int insert(FavoriteCoin favoriteCoin);
     int delete(FavoriteCoin favoriteCoin);
 }
