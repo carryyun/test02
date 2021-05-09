@@ -6,7 +6,7 @@
 <mapper namespace="yun.cms.dao.FavoriteCoinDAO">
 	
 	<resultMap type="FavoriteCoin" id="FavoriteCoinMap">
-		<id column="sid" property="usersid" />
+		<result column="sid" property="usersid" />
 		<result column="coinname" property="coinname" />
 	</resultMap>
 	
@@ -16,7 +16,7 @@
 		from
 			favoriteCoin
 		where
-			sid=#{no}
+			sid=#{usersid}
 	</select>
 	
 	<insert id="insert">
@@ -26,7 +26,7 @@
 	<delete id="delete">
 		delete from favoriteCoin
 		where
-			usersid=#{usersid} and coinname=#{coinname}
+			sid=#{usersid} and coinname=#{coinname}
 	</delete>
 	
 </mapper>

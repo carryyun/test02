@@ -5,6 +5,7 @@ import yun.cms.dto.UserAccount;
 
 public interface UserAccountDAO {
     UserAccount findByNo(int no);
+    UserAccount findById(UserAccount userAccount);
     List<UserAccount> findAll();
     
     UserAccount insert(UserAccount userAccount);

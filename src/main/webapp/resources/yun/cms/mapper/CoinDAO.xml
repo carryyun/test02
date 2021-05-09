@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+  <mapper namespace="yun.cms.dao.CoinDAO" >
+  	<resultMap type="Coin" id="CoinMap">
+  		<id column="cid" property="cid"/>
+  		<result column="market" property="market" />
+  		<result column="korean_name" property="korean_name" />
+  		<result column="english_name" property="english_name"/>
+  	</resultMap>
+  
+  <select id="findAll" resultMap="CoinMap">
+  	select
+  		*
+  	from
+  		coin
+  </select>
+  
+  <insert id="insert">
+  	insert into coin(market,korean_name,english_name) values(#{market},#{korean_name},#{english_name}) 
+  </insert>
+  
+  
+  
+  </mapper>

@@ -1,9 +1,13 @@
 package yun.cms.web;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import javax.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -11,9 +15,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import yun.cms.dto.Coin;
 import yun.cms.dto.FavoriteCoin;
 import yun.cms.dto.Test;
+import yun.cms.dto.UserAccount;
+import yun.cms.service.CoinService;
 import yun.cms.service.FavoriteCoinService;
 import yun.cms.service.UserAccountService;
 
@@ -22,12 +30,99 @@ import yun.cms.service.UserAccountService;
 public class TestController {
     UserAccountService userAccountService;
     FavoriteCoinService favoriteCoinService;
+    CoinService coinService;
     
     public TestController(UserAccountService userAccountService,
-                        FavoriteCoinService favoriteCoinService) {
+                        FavoriteCoinService favoriteCoinService,
+                        CoinService coinService) {
         this.userAccountService=userAccountService;
         this.favoriteCoinService=favoriteCoinService;
+        this.coinService=coinService;
     }
+    private String location="upbitTest8";
+    
+  //[21-05-09]작업 - 
+    @RequestMapping("/upbitTest8")
+    public void upbitTest8(Model model, HttpSession session) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        
+        UserAccount getUser;
+        String favCoin="null";
+        System.out.println(session.getAttribute("curUser"));
+        
+        
+        if( session.getAttribute("curUser") !=null ) {
+            getUser = mapper.readValue(session.getAttribute("curUser").toString(), UserAccount.class);
+            List<String> list = favoriteCoinService.listByNo(getUser.getUsersid());
+            favCoin=mapper.writeValueAsString(list);
+        }
+        model.addAttribute("favCoin", favCoin);
+        
+        List<Coin> clist = coinService.list();
+        model.addAttribute("clist", mapper.writeValueAsString(clist) );
+    }
+    
+    @RequestMapping("/login")
+    public void login() {
+        
+    }
+    @RequestMapping(value = "/signOut.do", method = RequestMethod.POST)
+    public String sighOutdo(HttpSession session) {
+        session.setAttribute("curUser", null);
+        return "redirect:"+location;
+    }
+    
+    @RequestMapping(value = "/signIn.do", method = RequestMethod.POST)
+    public String signIndo(UserAccount user, HttpSession session) throws JsonProcessingException {
+        UserAccount getUser = userAccountService.get(user);
+        
+        if( getUser.getPw().equals(user.getPw()) ){
+            System.out.println("일치");
+        }
+        getUser.setPw(null);
+        
+        ObjectMapper mapper = new ObjectMapper();
+        
+        session.setAttribute("curUser", mapper.writeValueAsString(getUser));
+        return "redirect:"+location;
+    }
+    
+    
+    //[21-05-09] 배열형식에 담겨있는 JSON파싱방법
+    //복습용으로 남겨두지만 사용하진 않을예정
+    @ResponseBody
+    public List<Coin> testGetdo() {
+        URL url;
+        List<Coin> clist= new ArrayList<Coin>();
+        try {
+            url = new URL("https://api.upbit.com/v1/market/all?isDetails=false");
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            con.setRequestMethod("GET");
+            
+            //[21-05-09] 200=정상응답
+            if(con.getResponseCode() == 200) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(con.getInputStream()));
+                String readline=reader.readLine();
+                ObjectMapper mapper = new ObjectMapper();
+                clist = mapper.readValue(readline, new TypeReference<List<Coin>>(){ });
+                System.out.println(clist);
+                for(Coin c:clist) {
+                    String tmpName=c.getMarket().toString().substring(0, 3);
+                    if(tmpName.equals("KRW")) {
+                        String subs=c.getMarket().toString().substring(4, c.getMarket().toString().length());
+                        c.setMarket(subs);
+                        coinService.insert(c);
+                    }
+                }
+                reader.close();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return clist;
+    }
+    
+    
     
     //[21-05-07]작업 - 
     @RequestMapping("/upbitTest7")

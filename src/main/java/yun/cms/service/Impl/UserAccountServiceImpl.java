@@ -35,4 +35,9 @@ public class UserAccountServiceImpl implements UserAccountService{
     public int delete(UserAccount userAccount) {
         return userAccountDAO.delete(userAccount);
     }
+
+    @Override
+    public UserAccount get(UserAccount userAccount) {
+        return userAccountDAO.findById(userAccount);
+    }
 }

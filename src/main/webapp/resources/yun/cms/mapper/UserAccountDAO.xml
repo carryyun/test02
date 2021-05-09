@@ -28,6 +28,14 @@
 		where
 			usersid=#{no}
 	</select>
+	<select id="findById" resultMap="UserAccountMap">
+		select
+			*
+		from
+			userAccount
+		where
+			id=#{id}
+	</select>
 	
 	<insert id="insert">
 		insert into userAccount(id,pw) values(#{id},#{pw})
