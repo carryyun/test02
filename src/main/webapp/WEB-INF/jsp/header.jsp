@@ -34,7 +34,7 @@
 
 
 <script>
-const mainpage="upbitTest8";
+const mainpage="upbitTest9";
 $(document).ready(function(){
 	
 	if( ${sessionScope.curUser == null} ){

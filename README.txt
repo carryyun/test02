@@ -14,20 +14,28 @@ https://milkoon1.tistory.com/33 - IT 개발구조 총정리 - 프론트엔드와
 
 내가 모르는게 뭔지 알아보고 차례대로 공부해야함
 웹소켓( webSocket.binaryType , 수신값에 Uint8Array사용 , TextDecoder ), 람다식, 쓰레드, 쓰레드풀, 크론, MVC라는게 정확히 뭔지
-솔리드원칙, 서버사이드렌더링/클라이언트 사이드 렌더링 , 워커
+솔리드원칙, 서버사이드렌더링/클라이언트 사이드 렌더링 , 워커, 마샬링(=모델링), lodash, Enums
+React Developer Tools(데브툴 확장 깔고 개발자 모드 켜고 위치 접속하면 페이지 이동시나 이벤트 발생시 바뀌는 요소들이 테두리로 표현되거든요
+이거 보면 아마 리액트나 뷰 쓰는 이유 확 이해 갈거예요)
 
+FIXME, TODO등 주석을 다는 형식도 있음(https://drunkenma.tistory.com/6)(https://devilbbong.tistory.com/13)
 
-[ *해결해야할 문제* ]
- - *해결필요* 전체코인 목록 작업 => 목록만 추가해둠. 내용을 추가해야하는데 한번에 값을받으면 업비트API가 block당함
+[ *해결완료* == FIXED ]
+FIXED* 전체코인 목록 작업 => 목록만 추가해둠. 내용을 추가해야하는데 한번에 값을받으면 업비트API가 block당함
                - 시간차를 두고 전체목록도 즐겨찾기와 동일한 항목으로 출력해보려했으나 역시 API로 보낸 요청이 거부당함
                  ticker를 이용해 현재가, 전일대비 상승%, 거래량등으로 내용을 수정해서 출력해야할 것 같음.
+               => 웹소캣을 이용하면 요청갯수에 제한이없음. REST->웹소캣 변경완료
+FIXED* 첫번째 아이템을 삭제해도 코인상세정보는 바뀌지않음. (2가지 방법중 선택할것)
+    - 1. 코인상세정보를 그 다음코인으로 바꿔주던가
+    - 2. 테이블과 아이템의 getTrade가 따로 돌아가게 코딩되어있는지 확인해보던가
+    => 웹소캣으로 데이터를 받고부터 실시간갱신으로 변경됨 상관없어짐.
+
+[ *해결해야할 문제* == FIXME ]
+ FIXME 검색기능 작동안함 coinItem의 ID지정이 문제임 아이템 추가시 전체목록과 즐겨찾기의 아이디숫자를 공유할때 생긴 문제. i값을 조정해줘야함.
  - *해결필요* 임시작성, 비로그인일시 코인상세정보에 BTC로 설정을해둠 => 이마저도 에러뜸 주석처리 해뒀으니 수정해야함
  - *해결필요* 코인정보를 담는 Coin클래스를 추가함.
               1. 이미 만들어둔 FavoriteCoin클래스 외에 거래볼륨 데이터를 어디에 추가할지, chart관련 DTO도 새로만들어야할지
  - *해결필요* 코인 상세정보 패널 거래량그래프의 col을 1~2정도 줄이고 옵션을 설정할 수 있는 패널 추가할지?
- - *해결필요* 첫번째 아이템을 삭제해도 코인상세정보는 바뀌지않음. (2가지 방법중 선택할것)
-    - 1. 코인상세정보를 그 다음코인으로 바꿔주던가
-    - 2. 테이블과 아이템의 getTrade가 따로 돌아가게 코딩되어있는지 확인해보던가
  - *해결필요* 체결량을 일정주기마다 초기화 시켜줘야 추세의 변화가 더 확실하게 보일 것 같음. [21-05-06] 기초는 잡아둠
  - *해결필요* getTrade나 setItem setUpbitData중 선택해 API가 호출되는 시간에 차이 줘야할것같음 > 짧은시간에 많은요청은 block됨.
  - *해결필요* 아이템이 삭제되었는데도 삭제된 아이템에 대해 한번 실행되는 문제가 있음. setTimeout의 작동순서를 확인해봐야할것같음
@@ -37,15 +45,38 @@ https://milkoon1.tistory.com/33 - IT 개발구조 총정리 - 프론트엔드와
  
 
 [ *추가할지 고민* ]
+- *고민* 현재 리스트의 아이템들도 데이터가 들어올때마다 갱신시켜주는데 Worker를 이용해야할지?
 - *고민* ajax를 통해 업비트 데이터를 받아오는 함수는 자바스크립트에 있는게 맞는지? 컨트롤러에 있는게 맞는지?
-
 - *고민* coin에 burn()에서 삭제되지 않는 누적체결볼륨을 추가해 설정에따라 삭제되는 누적볼륨or삭제없이 계속 쌓이게할지 선택?
 - *고민* burn()에서 삭제되는 주기와 수치조절
 - *고민* 마켓뎁스까지 추가할지?
 - *고민* *마지막작업* js를 분리시켜야할 것 같고, 또한 서비스, 컨트롤러에서 해결할 수 있는 문제들도 js에서 분리시켜야 할 것같음.
 
 
-[ 21-05-09 작업내역 ]
+[ 21-05-11 작업내역 ]
+FIXED* 리스트를 클릭했을때 한번이상의 거래가 있어야 정보를 받아오면서 바뀌게 됨.
+ - 클릭한 당시에 내용이 바뀌도록 해야함. REST로 데이터를 받던가, 스냅샷으로 바로 데이터를 뽑아오던가.
+ => setInfoText(code) 함수 추가. 이 함수는 open high low가격정보와 코인이름, 즐겨찾기 여부를 갱신시킨다.
+
+FIXED* 기존에 화면을 갱신, 업데이트 함수 제거 => setInfoText, itemClick, setInfoData, setCoinData, updateItem, addItem 함수 추가
+ =>   const tabPage= [ $('#coinListAll'), $('#coinList') ]
+      setCoinData(data)       - 웹소캣으로 받은 data를 coinData객체에 넣어서 coinDataMap에 저장한다. key값은 marketCode(ex. KRW-BTC 등...)
+      updateItem(coindata,tabIndex) - coindata객체 / tabIndex: 0=전체목록 1=즐겨찾기 리스트의 그래프를 갱신시키는 함수
+      addItem(tabIndex)       - tabIndex: 0=전체목록 1=즐겨찾기. 리스트에 아이템을 추가하는 함수
+      setInfoData(coindata)   - coindata객체 코인상세정보(그래프,테이블 등)을 갱신시키는 함수
+      setInfoText(code)       - code:XRP,BTC... open high low가격정보와 코인이름, 즐겨찾기 여부를 갱신
+      itemClick(item)         - item 리스트의 아이템. setInfoText와initChart(coinName : BTC,XRP 등..)를 호출한다
+
+삭제함수 수정 removeItem(item, e) arguments.length를 통해 자바스크립트에서도 오버로딩을 구현할 수 있음
+ - 상세정보의 즐겨찾기 버튼으로 삭제하면 item만 넘겨주기때문에 arguments.length==1 이 작동
+   즐겨찾기 리스트에서 휴지통버튼으로 삭제시 arguments.length==2가 작동
+즐겨찾기 버튼 추가
+ - 추가는 즐겨찾기 목록인 initListName에 push, addItem(1)을 실행해 즐겨찾기탭에 아이템추가
+FIXME 검색기능 작동안함
+ - coinItem의 ID지정이 문제임 아이템 추가시 전체목록과 즐겨찾기의 아이디숫자를 공유할때 생긴 문제. i값을 조정해줘야함
+
+
+[ 21-05-10 작업내역 ]
 ** 업비트 데이터 받는 방식을 REST>웹소켓 => 웹소켓의 장점 = 실시간으로 정보를 계속 받아볼 수 있으면서도 업비트 요청갯수제한이 없음.
  - function getUpbitData(coinName, cnt, reqType)
    coinName : 코인이름 형식 ex) BTT, XRP, QUTM
@@ -81,20 +112,16 @@ Worker를 이용하면 일정시간마다 함수를 실행하기위해 setTimeou
 1. 화면업데이트하는 함수마다 RestAPI를 호출하지않고 매개변수로 데이터를 받거나, 받은 데이터를 미리 Map에 저장해놓고,
 Map에서 데이터를 꺼내 이를 이용해서 출력하는방식
 2. addListItem, addListItemAll / addItem, addItemAll 단순히 복사한 함수들 정리
-
 function coinData(){
 		code		="";
 		kr_name		="";
 		bidVolume	="";
 		askVolume	="";
 		totalVolume	="";
-		
 		// tradeData가 들어감
 		tradeArr	= new Array();
 }
 let coinDataMap= new Map();
-
-
 function tradeData(){
    id="";
 	time="";
@@ -102,8 +129,6 @@ function tradeData(){
 	price="";
 	volume="";
 }
-
-
 ==============================================================================================================================
 
 
@@ -127,7 +152,7 @@ rest를 써야하는 이유 - 과거내역을 불러올 수 있음.
 - jackson의 TypeReference를 이용해 리스트에 저장한 뒤 보내는 방식을 이용했음
    => List<사용할 Class> = mapper.readValue('배열이 담긴 문자열', new TypeReference<List<'사용할 Class'>>(){ });
 
-*해결필요* 전체코인 목록 작업
+FIXED* 전체코인 목록 작업
  - 전체 코인목록 DB에 저장, 코인리스트는 전체코인과 즐겨찾기로 구성
  - 전체목록의 리스트는 아직 이름만 설정해뒀음. 내용을 추가해야하는데 한번에 값을받으면 업비트API가 block당함
     1. 즐겨찾기와는 다른 내용을 채우던가 2. 즐겨찾기보다 내용을 간소화하고 컨트롤러에서 API로 값을 받고 DB에 저장후 불러오는식으로?
