@@ -39,9 +39,36 @@ public class TestController {
         this.favoriteCoinService=favoriteCoinService;
         this.coinService=coinService;
     }
-    private String location="upbitTest8";
+    private String location="upbitTest9";
     
-  //[21-05-09]작업 - 
+    
+    //[21-05-09]작업 - 
+    @RequestMapping("/upbitTest9")
+    public void upbitTest9(Model model, HttpSession session) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        
+        UserAccount getUser;
+        String favCoin="null";
+        System.out.println(session.getAttribute("curUser"));
+        
+        
+        if( session.getAttribute("curUser") !=null ) {
+            getUser = mapper.readValue(session.getAttribute("curUser").toString(), UserAccount.class);
+            List<String> list = favoriteCoinService.listByNo(getUser.getUsersid());
+            favCoin=mapper.writeValueAsString(list);
+        }
+        model.addAttribute("favCoin", favCoin);
+        
+        List<Coin> clist = coinService.list();
+        model.addAttribute("clist", mapper.writeValueAsString(clist) );
+    }
+    
+    public void socketTest() {
+        
+    }
+    
+    
+    //[21-05-09]작업 - 
     @RequestMapping("/upbitTest8")
     public void upbitTest8(Model model, HttpSession session) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
