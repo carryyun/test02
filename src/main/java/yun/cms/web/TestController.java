@@ -25,7 +25,6 @@ import yun.cms.service.CoinService;
 import yun.cms.service.FavoriteCoinService;
 import yun.cms.service.UserAccountService;
 
-
 @Controller
 public class TestController {
     UserAccountService userAccountService;
@@ -39,8 +38,79 @@ public class TestController {
         this.favoriteCoinService=favoriteCoinService;
         this.coinService=coinService;
     }
-    private String location="upbitTest9";
+    private String location="upbitTest11";
         
+    
+  //[21-05-12]작업 - 
+    
+    
+    @RequestMapping("/upbitTest11")
+    public void upbitTest11(Model model, HttpSession session) throws IOException {
+        Abcd abc = (int a, int b) -> {return a+b;}; 
+        System.out.println( abc.aPb(1, 2) );
+        
+        
+        
+        ObjectMapper mapper = new ObjectMapper();
+        
+        UserAccount getUser;
+        String favCoin="null";
+        System.out.println(session.getAttribute("curUser"));
+        
+        
+        if( session.getAttribute("curUser") !=null ) {
+            getUser = mapper.readValue(session.getAttribute("curUser").toString(), UserAccount.class);
+            List<String> list = favoriteCoinService.listByNo(getUser.getUsersid());
+            favCoin=mapper.writeValueAsString(list);
+        }
+        model.addAttribute("favCoin", favCoin);
+        
+        List<Coin> clist = coinService.list();
+        model.addAttribute("clist", mapper.writeValueAsString(clist) );
+        
+        List<String> clistCode = new ArrayList<String>();
+        for(Coin c:clist) {
+            clistCode.add("KRW-"+c.getMarket());
+        }
+        model.addAttribute("clistCode", mapper.writeValueAsString(clistCode) );
+        
+    }
+    
+    // upbitTest11 = 리액트 연습페이지
+    @RequestMapping("/reactTest1")
+    public void reactTest1(){
+        
+    }
+    
+    @RequestMapping("/upbitTest10")
+    public void upbitTest10(Model model, HttpSession session) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        
+        UserAccount getUser;
+        String favCoin="null";
+        System.out.println(session.getAttribute("curUser"));
+        
+        
+        if( session.getAttribute("curUser") !=null ) {
+            getUser = mapper.readValue(session.getAttribute("curUser").toString(), UserAccount.class);
+            List<String> list = favoriteCoinService.listByNo(getUser.getUsersid());
+            favCoin=mapper.writeValueAsString(list);
+        }
+        model.addAttribute("favCoin", favCoin);
+        
+        List<Coin> clist = coinService.list();
+        model.addAttribute("clist", mapper.writeValueAsString(clist) );
+        
+        List<String> clistCode = new ArrayList<String>();
+        for(Coin c:clist) {
+            clistCode.add("KRW-"+c.getMarket());
+        }
+        model.addAttribute("clistCode", mapper.writeValueAsString(clistCode) );
+        
+    }
+    
+    
+    
     
     //[21-05-11]작업 - 
     @RequestMapping("/upbitTest9")
