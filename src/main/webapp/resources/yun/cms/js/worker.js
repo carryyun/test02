@@ -13,5 +13,5 @@ function loop() {
 	
 	setTimeout( function() {
     	loop();
-    }, 2000 );	
+    }, 500 );	
 }

@@ -13,7 +13,9 @@ https://milkoon1.tistory.com/33 - IT 개발구조 총정리 - 프론트엔드와
 내가 구현한 방식을 항상 왜 이방식을 사용했는지 설명할 수 있어야함
 
 내가 모르는게 뭔지 알아보고 차례대로 공부해야함
-*필수(람다식, 컬렉션 , 스트림) , (면접시 document질문도 많이함)*
+*필수(람다식, 컬렉션 , 스트림) , (면접시 document질문도 많이함)* upbitTest12에 Ele15 복습
+ https://primefaces.org/
+
 웹소켓( webSocket.binaryType , 수신값에 Uint8Array사용 , TextDecoder ), , 쓰레드, 쓰레드풀, 크론, MVC라는게 정확히 뭔지
 솔리드원칙, 서버사이드렌더링/클라이언트 사이드 렌더링 , 워커, 마샬링(=모델링), lodash, Enums
 React Developer Tools(데브툴 확장 깔고 개발자 모드 켜고 위치 접속하면 페이지 이동시나 이벤트 발생시 바뀌는 요소들이 테두리로 표현되거든요
@@ -65,7 +67,17 @@ FIXME 마켓뎁스 클릭시 해당코인으로 변경시켜야함
 - *고민* *마지막작업* js를 분리시켜야할 것 같고, 또한 서비스, 컨트롤러에서 해결할 수 있는 문제들도 js에서 분리시켜야 할 것같음.
 
 
+[ 21-05-14 작업내역 ]
+npm을 이용해 node_modules를 install. 현재 프로젝트에서도 React 사용이 가능해짐
+FIXME coinList, coinListAll 리액트로 구현
+ - Map형식 데이터를 받음. Map의 values메소드로 값만 뽑아 Array.from으로 변수에 저장한 뒤, Array의 map 메소드를 활용해 React에 활용함
+ - window.setDatamap = setDatamap; useState에서 setter에 해당하는 함수를 전역함수로(?) 저장한 뒤 워커로 리랜더링.(정석은 아닌듯함)
+ - FIXME onMouseEnter, onClick을 마저 구현해야함, 매개변수로 값을 넘겨주는법, 로드시 바로 실행되는문제 등 해결해야함
+   그 후 React에서 원하는 DOM을 선택해 제어하는법도 알아야함(ref같음)
+
+
 [ 21-05-12 작업내역 ]
+
 tabManager 클래스 추가 (ES6형식)
  - 클래스변수를 선언할때는 생성자 안에 this.필드명 = "내용"으로 => constructor(){ 내용 } 
  - 클래스 메소드에서 클래스변수를 사용할때는 this.필드명 으로 사용

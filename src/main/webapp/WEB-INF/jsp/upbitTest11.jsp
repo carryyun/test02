@@ -20,16 +20,16 @@
 
 
 <body>
-<div id="reactRoot">
-			
+<div id="reactRoot" style="background: #fff">
+		
 </div>
 
-<%-- <%@include file="header.jsp"%> --%>
+<!-- <%@include file="header.jsp"%> -->
 <div id="wrapbody" class="wrap body">
 	
 	<div class="container">
 	
-		<div style="display: none;">
+		<div style="display: block;">
 			<input type="text" id="testInput1"> <input type="text" id="testInput2">
 			<button onclick="Test(this)">Go!</button> <button onclick="addItem(this)">ADDITEM!</button>
 		</div>
@@ -181,6 +181,7 @@
 					</div>
 				</div>
 				<div class="abc"></div>
+				
 			</div>
 	</div>
 	
@@ -199,11 +200,355 @@
 
 <script crossorigin src="https://unpkg.com/react@17/umd/react.development.js"></script>
 <script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.26.0/babel.min.js"></script>
+
+<script type="text/babel">
+
+let result = window.babelTest("hi");
+console.log(result);
+
+class Welcome extends React.Component {
+	render() {
+		return <h1>Hello, {this.props.name}</h1>;
+	}
+}
+const ele7 = <Welcome name="sola" />;
+ReactDOM.render(
+	ele7,
+	document.getElementById('reactRoot')
+);
+
+/* <div><a className="removeItemBtn fs-11" href="#"><i className="fas fa-trash-alt"></i></a>
+				</div>  */
+
+class Listitem extends React.Component {
+	state = {
+		number : 0,
+	}
+
+	testClick = () => {
+		this.setState({
+			number : this.state.number + 1
+		})
+
+		console.log(this.state.number);
+
+	}
+
+	render(){
+		const sty = {
+			display : 'block'
+		};
+		
+		return (
+			<div style={sty} className="col-md-12 coinItem" onClick={this.testClick} >
+				
+				<div className="row" id="itemToggle">
+					<div className="col-md-3">
+						<span className="marketName">{this.props.marketName}</span><br/>
+						<span className="marketPrice">{this.props.marketPrice}</span>
+					</div>
+					<div id="coinItemRight" className="col-md-9 d-flex-wrap">
+						<div id="barWrap-item" className="col-md-12 d-inline-block">
+							<div id="barBid-item">
+							</div>
+						</div>
+						
+						<div className="col-md-12 d-flex flex-wrap nop ">
+							<span id="bidVolumeSpan-item" className="col-md-6 text-left nop"></span>
+							<span id="askVolumeSpan-item" className="col-md-6 text-right nop"></span>
+							<span id="bidVolumePerSpan-item" className="col-md-6 text-left"></span>
+							<span id="askVolumePerSpan-item" className="col-md-6 text-right"></span>
+						</div>
+						
+					</div>
+				</div>
+				<div className="abc"></div>
+					
+			</div>
+
+		);
+
+	}		
+
+}
+
+const element = <Listitem marketName="솔라" marketPrice="100000" />;
+
+const Itemsadd = ({value}) =>(
+	<span>
+		<h1>{value}</h1>
+	</span>
+)
+const ArrEle = () => {
+	const arrTest = ${clistCode};
+
+	return(
+		<div>
+			{arrTest.map( (name,index) => (
+				<Itemsadd key={index} value={name} />
+			))}
+		</div>
+	);
+
+}
+
+const Ele10 = () => {
+	const [curColor, setColor] = React.useState('white');
+
+	const colorBlue = () => {
+		setColor('blue');
+	}
+	const colorRed = () => {
+		setColor('red');
+	}
+
+	return(
+		<div>
+			<h1 style={{color:curColor}}>테스트</h1>
+			<button onClick={colorBlue}>블루</button>
+			<button onClick={colorRed}>레드</button>
+		</div>
+	);
+}
 
 
+const Ele11 = () => {
+	const dataArr = ${clistCode};
+	const sty = {
+		display: 'block',
+	}
+	return(
+		<div>
+		{dataArr.map( (name,index) => (
+			<div key={index} style={sty} className="col-md-12 coinItem">
+				
+				<div className="row" id="itemToggle">
+					<div className="col-md-3">
+						<span className="marketName">{name.substr(4,name.length)}</span><br/>
+						<span className="marketPrice">{index}</span>
+					</div>
+					<div id="coinItemRight" className="col-md-9 d-flex-wrap">
+						<div id="barWrap-item" className="col-md-12 d-inline-block">
+							<div id="barBid-item">
+							</div>
+						</div>
+						
+						<div className="col-md-12 d-flex flex-wrap nop ">
+							<span id="bidVolumeSpan-item" className="col-md-6 text-left nop"></span>
+							<span id="askVolumeSpan-item" className="col-md-6 text-right nop"></span>
+							<span id="bidVolumePerSpan-item" className="col-md-6 text-left"></span>
+							<span id="askVolumePerSpan-item" className="col-md-6 text-right"></span>
+						</div>
+						
+					</div>
+				</div>
+				<div className="abc"></div>
+					
+			</div>
+		))}
+		</div>
+
+	)
+}
+
+const Ele12 = () => {
+	const dataArr = Array.from(coinDataMap.values());
+	const sty = {
+		display: 'block',
+	}
+	return(
+		<div>
+		{dataArr.map( (obj,index) => (
+			<div key={index} style={sty} className="col-md-12 coinItem">
+				
+				<div className="row" id="itemToggle">
+					<div className="col-md-3">
+						<span className="marketName">{obj.code.substr(4,obj.code.length)}</span><br/>
+						<span className="marketPrice">{_.first(obj.tradeArr).price}</span>
+					</div>
+					<div id="coinItemRight" className="col-md-9 d-flex-wrap">
+						<div id="barWrap-item" className="col-md-12 d-inline-block">
+							<div id="barBid-item">
+
+							</div>
+						</div>
+						
+						<div className="col-md-12 d-flex flex-wrap nop ">
+							<span id="bidVolumeSpan-item" className="col-md-6 text-left nop"></span>
+							<span id="askVolumeSpan-item" className="col-md-6 text-right nop"></span>
+							<span id="bidVolumePerSpan-item" className="col-md-6 text-left"></span>
+							<span id="askVolumePerSpan-item" className="col-md-6 text-right"></span>
+						</div>
+						
+					</div>
+				</div>
+				<div className="abc"></div>
+					
+			</div>
+		))}
+		</div>
+
+	)
+}
+
+const Ele13 = data => {
+	
+	const dataArr = Array.from(data.data.values());
+	// useState로 바꿔야하는가? 
+
+	const sty = {
+		display: 'block',
+	}
+	return(
+		<div>
+		{dataArr.map( obj => (
+			<div key={obj.code} style={sty} className="col-md-12 coinItem">
+				
+				<div className="row" id="itemToggle">
+					<div className="col-md-3">
+						<span className="marketName">{obj.code.substr(4,obj.code.length)}</span><br/>
+						<span className="marketPrice">{_.first(obj.tradeArr).price}</span>
+					</div>
+					<div id="coinItemRight" className="col-md-9 d-flex-wrap">
+						<div id="barWrap-item" className="col-md-12 d-inline-block">
+							<div id="barBid-item">
+
+							</div>
+						</div>
+						
+						<div className="col-md-12 d-flex flex-wrap nop ">
+							<span id="bidVolumeSpan-item" className="col-md-6 text-left nop"></span>
+							<span id="askVolumeSpan-item" className="col-md-6 text-right nop"></span>
+							<span id="bidVolumePerSpan-item" className="col-md-6 text-left"></span>
+							<span id="askVolumePerSpan-item" className="col-md-6 text-right"></span>
+						</div>
+						
+					</div>
+				</div>
+				<div className="abc"></div>
+					
+			</div>
+		))}
+		</div>
+
+	)
+}
+const Ele15 = data => {
+	// 배열로 넘어온 값을 처리할 방법? const [name, setName] = useState(); 
+	const [code, setCode] = React.useState('');
+	const dataArr = Array.from(data.data.values());
+	
+	React.useEffect(() => {
+		
+  	});
+
+	const sty = {
+		display: 'block',
+	}
+	return(
+		<div>
+		{dataArr.map( obj => (
+			<div key={obj.code} style={sty} className="col-md-12 coinItem">
+				
+				<div className="row" id="itemToggle">
+					<div className="col-md-3">
+						<span className="marketName">{setCode( obj.code.substr(4,obj.code.length) ) }{code}</span><br/>
+						<span className="marketPrice">{_.first(obj.tradeArr).price}</span>
+					</div>
+					<div id="coinItemRight" className="col-md-9 d-flex-wrap">
+						<div id="barWrap-item" className="col-md-12 d-inline-block">
+							<div id="barBid-item">
+
+							</div>
+						</div>
+						
+						<div className="col-md-12 d-flex flex-wrap nop ">
+							<span id="bidVolumeSpan-item" className="col-md-6 text-left nop"></span>
+							<span id="askVolumeSpan-item" className="col-md-6 text-right nop"></span>
+							<span id="bidVolumePerSpan-item" className="col-md-6 text-left"></span>
+							<span id="askVolumePerSpan-item" className="col-md-6 text-right"></span>
+						</div>
+						
+					</div>
+				</div>
+				<div className="abc"></div>
+					
+			</div>
+		))}
+		</div>
+
+	)
+}
+const Ele14 = data => {
+	//실패
+	// 배열로 넘어온 값을 처리할 방법? const [name, setName] = useState(); 
+	const [datamap, setDatamap] = React.useState(data.data);
+	window.setDatamap = setDatamap;
+	
+	const dataArr = Array.from(datamap.values());
+	
+	React.useEffect(() => {
+		console.log(datamap);
+  	});
+
+	const sty = {
+		display: 'block',
+	}
+	return(
+		<div>
+		{dataArr.map( obj => (
+			<div key={obj.code} style={sty} className="col-md-12 coinItem">
+				
+				<div className="row" id="itemToggle">
+					<div className="col-md-3">
+						<span className="marketName"> {obj.code.substr(4,obj.code.length)}</span><br/>
+						<span className="marketPrice">{_.first(obj.tradeArr).price}</span>
+					</div>
+					<div id="coinItemRight" className="col-md-9 d-flex-wrap">
+						<div id="barWrap-item" className="col-md-12 d-inline-block">
+							<div id="barBid-item">
+
+							</div>
+						</div>
+						
+						<div className="col-md-12 d-flex flex-wrap nop ">
+							<span id="bidVolumeSpan-item" className="col-md-6 text-left nop"></span>
+							<span id="askVolumeSpan-item" className="col-md-6 text-right nop"></span>
+							<span id="bidVolumePerSpan-item" className="col-md-6 text-left"></span>
+							<span id="askVolumePerSpan-item" className="col-md-6 text-right"></span>
+						</div>
+						
+					</div>
+				</div>
+				<div className="abc"></div>
+					
+			</div>
+		))}
+		</div>
+
+	)
+}
+
+
+
+function ren(dataMap){
+
+	ReactDOM.render(
+	<Ele14 data={dataMap} />,
+	/* document.getElementById("coinListAll") */
+	document.getElementById("coinListAll")
+	);
+}
+
+
+
+</script>
 
 <script type="text/javascript">
-
+function babelTest(a){
+	return a;
+}
 
 //Ver.9
 //0510이전버전: 코인리스트 여러개 출력 / 헤더,풋터 틀잡기 / 리스트의 아이템 클릭시 토글기능[coinList의 내용비움, infoToggle도 분리]
@@ -314,15 +659,13 @@ function Test(item){
 	
 	*/
 	
-	/* 
-	var worker = new Worker( '/resources/yun/cms/js/worker.js' );
+	/* var worker = new Worker( '/resources/yun/cms/js/worker.js' );
 	worker.postMessage( '워커 실행' );  // 워커에 메시지를 보낸다.
 	// 워커로 부터 메시지를 수신한다.
 	worker.onmessage = function( e ) {
 	    console.log('호출 페이지 - ', e.data );
-	    console.log(getTrade("XRP"));
 	}; */
-	
+	window.ren(coinDataMap);
 	/* tabManager.showAll(0);
 	tabManager.search("BT",0); */
 }
@@ -368,8 +711,12 @@ function getTradeData(){
 		}
 		
 		updateItem(coinDataMap.get(data.code),0);
-		
 		/* socket.close(); */
+		if(window.setDatamap !== undefined){
+			/* console.log(typeof window.setDatamap); */
+			window.setDatamap(coinDataMap);
+		}
+			
 	}
 	// 발견된 문제?
 	// 웹소캣으로 계속 데이터를 받으면 속도저하등의 문제는 없는지?
@@ -465,6 +812,7 @@ function setCoinData(data){
 	coindata.tradeArr.push(tradedata);
 	
 	coinDataMap.set(data.code, coindata);
+	
 }
 
 function setInfoData(coindata){
@@ -589,13 +937,13 @@ $(function() {
 	//burn();
 	
 	for(let i=0; i<listAll.length;i++){
-		addItem(0);
+		// addItem(0);
 	}
 	if(${sessionScope.curUser != null}){
 		if(initListName.length>0){
 			initListName.forEach(i => {
-		    	addItem(1); // addItem(tabIndex); 0:전체목록 1:즐겨찾기
-		    	updateItem(coinDataMap.get("KRW-"+i),1);
+		    	// addItem(1); // addItem(tabIndex); 0:전체목록 1:즐겨찾기
+		    	// updateItem(coinDataMap.get("KRW-"+i),1);
 		    });
 		}
 	}
@@ -1118,28 +1466,6 @@ function testInsert(){
 }
 </script>
 
-<script type="text/babel">
-class Tr() extends React.Component{
-	render(){
-		return <h1>name= {this.props.name}.</h1>;
-	}
-}
-const re = <Tr name="솔라" />;
-
-
-class Welcome extends React.Component {
-	render() {
-		return <h1>Hello, {this.props.name}</h1>;
-	}
-}
-
-const ele7 = <Welcome name="sola" />;
-
-ReactDOM.render(
-	ele7,
-	document.getElementById('reactRoot')
-);
-</script>
 </body>
 
 </html>
