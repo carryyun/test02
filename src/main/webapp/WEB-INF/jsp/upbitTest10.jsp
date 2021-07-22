@@ -306,13 +306,13 @@ function tradeData(){
 	price="";
 	volume="";
 }
+
 function coinData(){
 		code		="";
 		kr_name		="";
 		bidVolume	=0;
 		askVolume	=0;
 		totalVolume	=0;
-		
 		//tradeData가 들어감
 		tradeArr	= new Array();
 }

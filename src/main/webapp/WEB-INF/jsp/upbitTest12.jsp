@@ -38,7 +38,7 @@
 			<div class="colmar-md-9 mr-10 darkBluePane p-10">
 				<!-- infoToggle을 다시 고정형으로 변경함. ID는 그냥 그대로사용하기로 -->
 				<div class="row" id="infoToggle">
-					<div id="infoL" class="col-md-12">
+					<div id="infoL" class=ol-md-12">
 						<div class="row">
 						
 							<!-- infoDiv의 왼쪽 [테이블]-->
@@ -73,19 +73,6 @@
 										<span class="col-md-4"  id="tableCoinLow">Low</span>
 										<span class="col-md-8 text-right" id="tableCoinLowValue"></span>
 									</div>
-									
-									<!-- <div class="col-md-12 d-flex flex-wrap">
-										<span class="col-md-4">종가</span>
-										<span class="col-md-8 text-right" style="text-align: right">1,000,000</span>
-									</div>
-									<div class="col-md-12 d-flex flex-wrap">
-										<span class="col-md-4"></span>
-										<span class="col-md-8 text-right" style="text-align: right">+ 50%</span>
-									</div>
-									<div class="col-md-12 d-flex flex-wrap">
-										<span class="col-md-4">기타</span>
-										<span class="col-md-8 text-right" style="text-align: right">텍스트</span>
-									</div> -->
 								</div>
 								
 								<!-- infoDiv의 오른쪽 [그래프], [거래량] -->
@@ -187,6 +174,7 @@ const Ele15 = data => {
 		const result = (obj.askVolume/obj.totalVolume)*100;
 		return result;
 	}
+
 	const removeEvent = (code,event) => {
 		//event.stopPropagation();
 		console.log(code);
@@ -242,7 +230,6 @@ function ren(dataMap){
 }
 
 </script>
-
 <script type="text/javascript">
 
 function Test(item){
@@ -397,7 +384,7 @@ function getTradeData(){
 		}
 		if(initListName != null){
 			//FIXME [21-05-14]임시주석 풀어야함 if( initListName.indexOf(data.code.substr(4,data.code.length)) != -1 )
-				//FIXME [21-05-14]임시주석 풀어야함 updateItem(coinDataMap.get(data.code),1);
+			//FIXME [21-05-14]임시주석 풀어야함 updateItem(coinDataMap.get(data.code),1);
 		}
 		
 		//updateItem(coinDataMap.get(data.code),0);
